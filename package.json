@@ -3,6 +3,6 @@
     "@ai-hero/sandcastle": "^0.5.10"
   },
   "scripts": {
-    "sandcastle":"pnpx tsc .sandcastle/main.mts"
+    "sandcastle": "npx tsx .sandcastle/main.mts"
   }
 }
