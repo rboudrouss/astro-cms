@@ -5,6 +5,7 @@ import { IpcChannels } from '../shared/ipc'
 import type { OpenProjectResult } from '../shared/types'
 import { validateProject } from './project-validator'
 import { RecentProjectsStore } from './recent-projects'
+import { setupAutoUpdater, installAndRestart } from './updater'
 
 let recentProjectsStore: RecentProjectsStore
 
@@ -70,6 +71,10 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.GET_LOCALE, () => {
     return app.getLocale()
   })
+
+  ipcMain.handle(IpcChannels.UPDATE_INSTALL_AND_RESTART, () => {
+    installAndRestart()
+  })
 }
 
 app.whenReady().then(() => {
@@ -77,6 +82,7 @@ app.whenReady().then(() => {
     join(app.getPath('userData'), 'recent-projects.json')
   )
   registerIpcHandlers()
+  setupAutoUpdater()
   createWindow()
 
   app.on('activate', () => {

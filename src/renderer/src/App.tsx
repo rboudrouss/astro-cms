@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { ProjectScreen } from '@/components/ProjectScreen'
 import { ErrorDialog } from '@/components/ErrorDialog'
+import { UpdateNotification } from '@/components/UpdateNotification'
 import type { ProjectInfo, ValidationError } from '../../shared/types'
 import type { RecentProject } from '../../shared/ipc'
 
@@ -40,6 +41,7 @@ export function App(): React.JSX.Element {
         />
       )}
       {errors && <ErrorDialog errors={errors} onClose={() => setErrors(null)} />}
+      <UpdateNotification />
     </>
   )
 }

@@ -6,6 +6,10 @@ Object.defineProperty(window, 'api', {
     cloneProject: vi.fn().mockResolvedValue(null),
     newProject: vi.fn().mockResolvedValue(null),
     getRecentProjects: vi.fn().mockResolvedValue([]),
-    getLocale: vi.fn().mockResolvedValue('fr')
-  }
+    getLocale: vi.fn().mockResolvedValue('fr'),
+    onUpdateDownloaded: vi.fn().mockReturnValue(vi.fn()),
+    installAndRestart: vi.fn().mockResolvedValue(undefined)
+  },
+  writable: true,
+  configurable: true
 })

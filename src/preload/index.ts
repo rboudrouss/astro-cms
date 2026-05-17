@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { IpcChannels, type RecentProject } from '../shared/ipc'
+import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
 import type { OpenProjectResult } from '../shared/types'
 
 const api = {
@@ -12,7 +12,16 @@ const api = {
   getRecentProjects: (): Promise<RecentProject[]> =>
     ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS),
   getLocale: (): Promise<string> =>
-    ipcRenderer.invoke(IpcChannels.GET_LOCALE)
+    ipcRenderer.invoke(IpcChannels.GET_LOCALE),
+  onUpdateDownloaded: (callback: (info: UpdateInfo) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, info: UpdateInfo): void => callback(info)
+    ipcRenderer.on(IpcChannels.UPDATE_DOWNLOADED, handler)
+    return () => {
+      ipcRenderer.removeListener(IpcChannels.UPDATE_DOWNLOADED, handler)
+    }
+  },
+  installAndRestart: (): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_INSTALL_AND_RESTART)
 }
 
 export type ElectronApi = typeof api
