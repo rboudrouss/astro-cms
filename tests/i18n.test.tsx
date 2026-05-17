@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, beforeEach } from 'vitest'
-import i18next from 'i18next'
+import { describe, it, expect } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { initI18n } from '@/i18n'
