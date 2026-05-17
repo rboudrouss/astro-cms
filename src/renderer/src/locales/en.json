@@ -1,0 +1,9 @@
+{
+  "subtitle": "WYSIWYG editor for Astro sites",
+  "openProject": "Open local project",
+  "cloneProject": "Clone from git",
+  "newProject": "New project",
+  "recentProjects": "Recent projects",
+  "noRecentProjects": "No recent projects",
+  "language": "Language"
+}

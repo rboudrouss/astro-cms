@@ -5,6 +5,7 @@ Object.defineProperty(window, 'api', {
     openProject: vi.fn().mockResolvedValue({ status: 'cancelled' }),
     cloneProject: vi.fn().mockResolvedValue(null),
     newProject: vi.fn().mockResolvedValue(null),
-    getRecentProjects: vi.fn().mockResolvedValue([])
+    getRecentProjects: vi.fn().mockResolvedValue([]),
+    getLocale: vi.fn().mockResolvedValue('fr')
   }
 })

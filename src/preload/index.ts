@@ -10,7 +10,9 @@ const api = {
   newProject: (): Promise<string | null> =>
     ipcRenderer.invoke(IpcChannels.NEW_PROJECT),
   getRecentProjects: (): Promise<RecentProject[]> =>
-    ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS)
+    ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS),
+  getLocale: (): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.GET_LOCALE)
 }
 
 export type ElectronApi = typeof api
