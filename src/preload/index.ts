@@ -68,6 +68,14 @@ const api = {
     ipcRenderer.invoke(IpcChannels.READ_PAGE_CONTENT, filePath),
   writePageContent: (filePath: string, content: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.WRITE_PAGE_CONTENT, filePath, content),
+  updateBlockProps: (
+    filePath: string,
+    blockName: string,
+    props: Record<string, unknown>
+  ): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_BLOCK_PROPS, filePath, blockName, props),
+  getBlockProps: (filePath: string, blockName: string): Promise<Record<string, unknown> | null> =>
+    ipcRenderer.invoke(IpcChannels.GET_BLOCK_PROPS, filePath, blockName),
   startDevServer: (projectPath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
   stopDevServer: (): Promise<void> =>

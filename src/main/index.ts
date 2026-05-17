@@ -12,6 +12,7 @@ import { generateProject } from './project-generator'
 import { needsInstall, detectPackageManager, installDependencies } from './dependency-installer'
 import { ThemeHotReloader } from './theme-hot-reloader'
 import { readPageContent, writePageContent } from './page-file'
+import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
@@ -147,6 +148,24 @@ function registerIpcHandlers(): void {
     IpcChannels.WRITE_PAGE_CONTENT,
     async (_event, filePath: string, content: string) => {
       await writePageContent(filePath, content)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.UPDATE_BLOCK_PROPS,
+    async (_event, filePath: string, blockName: string, props: Record<string, unknown>) => {
+      const source = await readPageContent(filePath)
+      const updated = await updateBlockProps(source, blockName, props)
+      await writePageContent(filePath, updated)
+      return updated
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.GET_BLOCK_PROPS,
+    async (_event, filePath: string, blockName: string) => {
+      const source = await readPageContent(filePath)
+      return extractBlockProps(source, blockName)
     }
   )
 

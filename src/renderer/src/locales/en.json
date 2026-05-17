@@ -54,6 +54,10 @@
     "path": "Path",
     "selectItem": "Select a page or entry to edit"
   },
+  "propEditor": {
+    "noBlockSelected": "Select a block to edit its properties",
+    "noSchema": "No editable properties for this block"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

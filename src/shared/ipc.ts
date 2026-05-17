@@ -25,6 +25,8 @@ export const IpcChannels = {
   THEME_MANIFEST_UPDATED: 'theme:manifest-updated',
   READ_PAGE_CONTENT: 'page:read-content',
   WRITE_PAGE_CONTENT: 'page:write-content',
+  UPDATE_BLOCK_PROPS: 'page:update-block-props',
+  GET_BLOCK_PROPS: 'page:get-block-props',
   DEV_SERVER_START: 'dev-server:start',
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
@@ -68,6 +70,14 @@ export type IpcHandlerMap = {
   }
   [IpcChannels.READ_PAGE_CONTENT]: { args: [filePath: string]; return: string }
   [IpcChannels.WRITE_PAGE_CONTENT]: { args: [filePath: string, content: string]; return: void }
+  [IpcChannels.UPDATE_BLOCK_PROPS]: {
+    args: [filePath: string, blockName: string, props: Record<string, unknown>]
+    return: string
+  }
+  [IpcChannels.GET_BLOCK_PROPS]: {
+    args: [filePath: string, blockName: string]
+    return: Record<string, unknown> | null
+  }
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }

@@ -54,6 +54,10 @@
     "path": "Chemin",
     "selectItem": "Sélectionnez une page ou une entrée pour l'éditer"
   },
+  "propEditor": {
+    "noBlockSelected": "Sélectionnez un bloc pour éditer ses propriétés",
+    "noSchema": "Aucune propriété éditable pour ce bloc"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",

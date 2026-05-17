@@ -23,6 +23,8 @@ Object.defineProperty(window, 'api', {
     onThemeManifestUpdated: vi.fn().mockReturnValue(vi.fn()),
     readPageContent: vi.fn().mockResolvedValue(''),
     writePageContent: vi.fn().mockResolvedValue(undefined),
+    updateBlockProps: vi.fn().mockResolvedValue(''),
+    getBlockProps: vi.fn().mockResolvedValue(null),
     startDevServer: vi.fn().mockResolvedValue(undefined),
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),

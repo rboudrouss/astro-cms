@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, FolderOpen, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -7,7 +7,13 @@ import { RawEditor } from '@/components/RawEditor'
 import { DevServerIndicator } from '@/components/DevServerIndicator'
 import { PreviewPane } from '@/components/PreviewPane'
 import { BlockInfoBar } from '@/components/BlockInfoBar'
-import type { ProjectInfo, ProjectTree, SidebarItem, DevServerStatus, BlockSelection, BlockSelectionMessage } from '../../../shared/types'
+import { PropEditorPanel } from '@/components/PropEditorPanel'
+import type {
+  ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
+  BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
+} from '../../../shared/types'
+
+const DEBOUNCE_MS = 500
 
 export function ProjectScreen({
   project,
@@ -22,18 +28,26 @@ export function ProjectScreen({
   const [editorContent, setEditorContent] = useState<string | null>(null)
   const [devServerStatus, setDevServerStatus] = useState<DevServerStatus>({ state: 'starting' })
   const [selectedBlock, setSelectedBlock] = useState<BlockSelection | null>(null)
+  const [themeManifest, setThemeManifest] = useState<ThemeManifest | null>(null)
+  const [blockProps, setBlockProps] = useState<Record<string, unknown> | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
     window.api.watchProject(project.path)
     window.api.startDevServer(project.path)
+    window.api.getThemeManifest(project.path).then((m) => {
+      if (m) setThemeManifest(m)
+    })
 
     const unsubTree = window.api.onProjectTreeChanged(setTree)
     const unsubStatus = window.api.onDevServerStatusChanged(setDevServerStatus)
+    const unsubManifest = window.api.onThemeManifestUpdated(setThemeManifest)
 
     return () => {
       unsubTree()
       unsubStatus()
+      unsubManifest()
       window.api.unwatchProject()
       window.api.stopDevServer()
     }
@@ -53,9 +67,21 @@ export function ProjectScreen({
     return () => window.removeEventListener('message', handler)
   }, [])
 
+  useEffect(() => {
+    if (!selectedBlock || !selectedItem) {
+      setBlockProps(null)
+      return
+    }
+    window.api.getBlockProps(selectedItem.fullPath, selectedBlock.blockName).then(setBlockProps)
+  }, [selectedBlock, selectedItem])
+
+  const selectedBlockManifest: BlockManifest | undefined =
+    themeManifest?.blocks.find((b) => b.name === selectedBlock?.blockName)
+
   const handleSelect = useCallback(async (item: SidebarItem) => {
     setSelectedItem(item)
     setSelectedBlock(null)
+    setBlockProps(null)
     const content = await window.api.readPageContent(item.fullPath)
     setEditorContent(content)
   }, [])
@@ -68,6 +94,29 @@ export function ProjectScreen({
     },
     [selectedItem]
   )
+
+  const handlePropChange = useCallback(
+    (props: Record<string, unknown>) => {
+      setBlockProps(props)
+      if (!selectedItem || !selectedBlock) return
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(async () => {
+        const updated = await window.api.updateBlockProps(
+          selectedItem.fullPath,
+          selectedBlock.blockName,
+          props
+        )
+        setEditorContent(updated)
+      }, DEBOUNCE_MS)
+    },
+    [selectedItem, selectedBlock]
+  )
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
 
   const devServerUrl = devServerStatus.state === 'running' ? devServerStatus.url : undefined
 
@@ -117,6 +166,15 @@ export function ProjectScreen({
                   </div>
                 )}
               </div>
+              {selectedBlockManifest && blockProps && (
+                <PropEditorPanel
+                  blockName={selectedBlockManifest.name}
+                  schema={selectedBlockManifest.props}
+                  cmsHints={selectedBlockManifest.cmsHints}
+                  values={blockProps}
+                  onChange={handlePropChange}
+                />
+              )}
             </>
           ) : selectedItem ? (
             <div className="flex flex-1 items-center justify-center">
