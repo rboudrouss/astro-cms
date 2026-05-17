@@ -4,11 +4,9 @@ import { AlertTriangle, ChevronDown } from 'lucide-react'
 import type { LayoutManifest } from '../../../shared/types'
 
 export function LayoutWarningBanner({
-  currentLayout: _currentLayout,
   themeLayouts,
   onApplyLayout
 }: {
-  currentLayout: string
   themeLayouts: LayoutManifest[]
   onApplyLayout: (layoutName: string) => void
 }): React.JSX.Element | null {

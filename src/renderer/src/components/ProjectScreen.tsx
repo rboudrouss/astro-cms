@@ -89,11 +89,9 @@ export function ProjectScreen({
     setEditorContent(content)
 
     const layoutRef = extractLayoutFromSource(content)
-    if (layoutRef && themeManifest && !isLayoutFromTheme(layoutRef, themeManifest.layouts)) {
-      setLayoutOutsideTheme(true)
-    } else {
-      setLayoutOutsideTheme(false)
-    }
+    setLayoutOutsideTheme(
+      Boolean(layoutRef && themeManifest && !isLayoutFromTheme(layoutRef, themeManifest.layouts))
+    )
   }, [themeManifest])
 
   const handleSave = useCallback(
@@ -169,7 +167,6 @@ export function ProjectScreen({
             <>
               {layoutOutsideTheme && themeManifest && (
                 <LayoutWarningBanner
-                  currentLayout={extractLayoutFromSource(editorContent) ?? ''}
                   themeLayouts={themeManifest.layouts}
                   onApplyLayout={handleApplyLayout}
                 />

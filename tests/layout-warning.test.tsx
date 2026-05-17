@@ -46,7 +46,6 @@ function renderBanner(
   props: Partial<React.ComponentProps<typeof LayoutWarningBanner>> = {}
 ): ReturnType<typeof render> {
   const defaultProps = {
-    currentLayout: '../layouts/Custom.astro',
     themeLayouts,
     onApplyLayout: vi.fn()
   }
