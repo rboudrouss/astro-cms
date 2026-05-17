@@ -1,6 +1,6 @@
 import { readFile, readdir, access } from 'fs/promises'
 import { join, basename, resolve } from 'path'
-import { Project, SyntaxKind, type PropertySignature } from 'ts-morph'
+import { Project, SyntaxKind, type PropertySignature, type ObjectLiteralExpression } from 'ts-morph'
 import type {
   ThemeManifest,
   BlockManifest,
@@ -58,48 +58,45 @@ function tsTypeToSimple(typeText: string): PropType {
   return 'unknown'
 }
 
-function parsePropsInterface(frontmatter: string): PropSchema[] {
+function parseFrontmatter(frontmatter: string): { props: PropSchema[]; cmsHints: CmsHints } {
   const project = new Project({ useInMemoryFileSystem: true })
   const sourceFile = project.createSourceFile('component.ts', frontmatter)
 
   const propsInterface = sourceFile.getInterface('Props')
-  if (!propsInterface) return []
+  const props: PropSchema[] = propsInterface
+    ? propsInterface.getProperties().map((prop: PropertySignature) => {
+        const schema: PropSchema = {
+          name: prop.getName(),
+          type: tsTypeToSimple(prop.getType().getText()),
+          required: !prop.hasQuestionToken()
+        }
 
-  return propsInterface.getProperties().map((prop: PropertySignature) => {
-    const schema: PropSchema = {
-      name: prop.getName(),
-      type: tsTypeToSimple(prop.getType().getText()),
-      required: !prop.hasQuestionToken()
-    }
+        const jsDocs = prop.getJsDocs()
+        if (jsDocs.length > 0) {
+          const description = jsDocs[0].getDescription().trim()
+          if (description) {
+            schema.description = description
+          }
+        }
 
-    const jsDocs = prop.getJsDocs()
-    if (jsDocs.length > 0) {
-      const description = jsDocs[0].getDescription().trim()
-      if (description) {
-        schema.description = description
+        return schema
+      })
+    : []
+
+  let cmsHints: CmsHints = {}
+  const cmsHintsVar = sourceFile.getVariableDeclaration('cmsHints')
+  if (cmsHintsVar) {
+    const initializer = cmsHintsVar.getInitializer()
+    if (initializer && initializer.getKind() === SyntaxKind.ObjectLiteralExpression) {
+      try {
+        cmsHints = new Function(`return (${initializer.getText()})`)() as CmsHints
+      } catch {
+        /* invalid initializer */
       }
     }
-
-    return schema
-  })
-}
-
-function parseCmsHints(frontmatter: string): CmsHints {
-  const project = new Project({ useInMemoryFileSystem: true })
-  const sourceFile = project.createSourceFile('component.ts', frontmatter)
-
-  const cmsHintsVar = sourceFile.getVariableDeclaration('cmsHints')
-  if (!cmsHintsVar) return {}
-
-  const initializer = cmsHintsVar.getInitializer()
-  if (!initializer || initializer.getKind() !== SyntaxKind.ObjectLiteralExpression) return {}
-
-  try {
-    const text = initializer.getText()
-    return new Function(`return (${text})`)() as CmsHints
-  } catch {
-    return {}
   }
+
+  return { props, cmsHints }
 }
 
 async function parseAstroComponent(
@@ -112,8 +109,9 @@ async function parseAstroComponent(
   const content = await readFile(filePath, 'utf-8')
   const { frontmatter, template } = splitAstroFile(content)
 
-  const props = frontmatter ? parsePropsInterface(frontmatter) : []
-  const cmsHints = frontmatter ? parseCmsHints(frontmatter) : {}
+  const { props, cmsHints } = frontmatter
+    ? parseFrontmatter(frontmatter)
+    : { props: [], cmsHints: {} }
   const slots = detectSlots(template)
 
   return { props, cmsHints, slots }
@@ -127,6 +125,15 @@ async function scanDirectory(dir: string): Promise<string[]> {
   }
   const entries = await readdir(dir)
   return entries.filter((f) => f.endsWith('.astro')).map((f) => join(dir, f))
+}
+
+function getStringProp(obj: ObjectLiteralExpression, name: string): string | undefined {
+  return obj
+    .getProperty(name)
+    ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
+    .getInitializer()
+    ?.asKindOrThrow(SyntaxKind.StringLiteral)
+    .getLiteralValue()
 }
 
 function parseThemeManifestFile(
@@ -158,29 +165,11 @@ function parseThemeManifestFile(
 
   const objLiteral = configObj.asKindOrThrow(SyntaxKind.ObjectLiteralExpression)
 
-  const nameProp = objLiteral.getProperty('name')
-  const name = nameProp
-    ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
-    .getInitializer()
-    ?.asKindOrThrow(SyntaxKind.StringLiteral)
-    .getLiteralValue()
+  const name = getStringProp(objLiteral, 'name')
   if (!name) throw new Error('Theme manifest must declare a name')
 
-  const layoutsDirProp = objLiteral.getProperty('layoutsDir')
-  const layoutsDir =
-    layoutsDirProp
-      ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
-      .getInitializer()
-      ?.asKindOrThrow(SyntaxKind.StringLiteral)
-      .getLiteralValue() ?? './layouts'
-
-  const blocksDirProp = objLiteral.getProperty('blocksDir')
-  const blocksDir =
-    blocksDirProp
-      ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
-      .getInitializer()
-      ?.asKindOrThrow(SyntaxKind.StringLiteral)
-      .getLiteralValue() ?? './blocks'
+  const layoutsDir = getStringProp(objLiteral, 'layoutsDir') ?? './layouts'
+  const blocksDir = getStringProp(objLiteral, 'blocksDir') ?? './blocks'
 
   let variables: Record<string, ThemeVariable> = {}
   const variablesProp = objLiteral.getProperty('variables')

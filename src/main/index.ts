@@ -8,8 +8,6 @@ import { validateProject as validateProjectReport } from './modules/project-vali
 import { RecentProjectsStore } from './recent-projects'
 import { setupAutoUpdater, installAndRestart } from './updater'
 import { ThemeHotReloader } from './theme-hot-reloader'
-import { parseThemeManifest } from './theme-manifest-parser'
-import { readFile } from 'fs/promises'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -87,16 +85,6 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.GET_THEME_MANIFEST, async (_event, projectPath: string) => {
     try {
-      const configContent = await readFile(join(projectPath, 'astro-cms.config.ts'), 'utf-8')
-      const themeImportRe = /import\s+\w+\s+from\s+['"](\.[^'"]*astro-cms\.theme)['"]/
-      const match = configContent.match(themeImportRe)
-      if (!match) return null
-      let importPath = match[1]
-      if (!importPath.endsWith('.ts')) importPath += '.ts'
-      const themeFilePath = join(projectPath, importPath)
-      const themeDir = join(themeFilePath, '..')
-      const manifest = await parseThemeManifest(themeDir)
-
       if (activeReloader) await activeReloader.stop()
       activeReloader = new ThemeHotReloader(projectPath, (updatedManifest) => {
         const windows = BrowserWindow.getAllWindows()
@@ -104,9 +92,7 @@ function registerIpcHandlers(): void {
           win.webContents.send(IpcChannels.THEME_MANIFEST_UPDATED, updatedManifest)
         }
       })
-      await activeReloader.start()
-
-      return manifest
+      return await activeReloader.start()
     } catch {
       return null
     }

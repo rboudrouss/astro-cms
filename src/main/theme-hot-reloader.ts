@@ -1,5 +1,5 @@
 import { watch, type FSWatcher } from 'chokidar'
-import { resolve } from 'path'
+import { resolve, dirname } from 'path'
 import { readFile } from 'fs/promises'
 import { parseThemeManifest } from './theme-manifest-parser'
 import type { ThemeManifest } from '../shared/types'
@@ -13,10 +13,7 @@ async function resolveThemeDir(projectPath: string): Promise<string | null> {
     if (!match) return null
     let importPath = match[1]
     if (!importPath.endsWith('.ts')) importPath += '.ts'
-    const themeFilePath = resolve(projectPath, importPath)
-    const parts = themeFilePath.split('/')
-    parts.pop()
-    return parts.join('/')
+    return dirname(resolve(projectPath, importPath))
   } catch {
     return null
   }
