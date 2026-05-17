@@ -2,8 +2,6 @@ import { access, readFile, stat } from 'fs/promises'
 import { join } from 'path'
 import type { ValidationIssue, ValidationReport } from '../../shared/validation'
 
-export type { ValidationSeverity, ValidationIssue, ValidationReport } from '../../shared/validation'
-
 async function exists(p: string): Promise<boolean> {
   try {
     await access(p)
@@ -104,29 +102,17 @@ export async function validateProject(projectPath: string): Promise<ValidationRe
       path: srcDir
     })
   } else {
-    if (!(await isDirectory(join(srcDir, 'pages')))) {
-      issues.push({
-        severity: 'warning',
-        code: 'PAGES_DIR_MISSING',
-        message: 'src/pages/ directory not found',
-        path: join(srcDir, 'pages')
-      })
-    }
-    if (!(await isDirectory(join(srcDir, 'content')))) {
-      issues.push({
-        severity: 'warning',
-        code: 'CONTENT_DIR_MISSING',
-        message: 'src/content/ directory not found',
-        path: join(srcDir, 'content')
-      })
-    }
-    if (!(await isDirectory(join(srcDir, 'themes')))) {
-      issues.push({
-        severity: 'warning',
-        code: 'THEMES_DIR_MISSING',
-        message: 'src/themes/ directory not found',
-        path: join(srcDir, 'themes')
-      })
+    const optionalSubdirs = ['pages', 'content', 'themes'] as const
+    for (const name of optionalSubdirs) {
+      const dirPath = join(srcDir, name)
+      if (!(await isDirectory(dirPath))) {
+        issues.push({
+          severity: 'warning',
+          code: `${name.toUpperCase()}_DIR_MISSING`,
+          message: `src/${name}/ directory not found`,
+          path: dirPath
+        })
+      }
     }
   }
 
