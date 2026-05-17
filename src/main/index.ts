@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { IpcChannels } from '../shared/ipc'
+import { setupAutoUpdater, installAndRestart } from './updater'
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -48,10 +49,15 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async () => {
     return []
   })
+
+  ipcMain.handle(IpcChannels.UPDATE_INSTALL_AND_RESTART, () => {
+    installAndRestart()
+  })
 }
 
 app.whenReady().then(() => {
   registerIpcHandlers()
+  setupAutoUpdater()
   createWindow()
 
   app.on('activate', () => {
