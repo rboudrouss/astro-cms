@@ -36,3 +36,13 @@ export type NewProjectResult =
   | { status: 'success'; project: ProjectInfo }
   | { status: 'error'; message: string }
   | { status: 'cancelled' }
+
+export type PackageManager = 'pnpm' | 'npm' | 'yarn'
+
+export type DepsCheckResult =
+  | { needed: false }
+  | { needed: true; packageManager: PackageManager }
+
+export type DepsInstallResult =
+  | { success: true; packageManager: PackageManager }
+  | { success: false; error: string; packageManager: PackageManager }

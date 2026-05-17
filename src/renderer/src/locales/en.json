@@ -25,5 +25,10 @@
     "successTitle": "Project created",
     "successMessage": "The project \"{{name}}\" was created successfully.",
     "openCreatedProject": "Open project"
-  }
+  },
+  "installingDeps": "Installing dependencies…",
+  "installingDepsUsing": "Installing via {{pm}}…",
+  "installSuccess": "Installation complete",
+  "installError": "Installation failed",
+  "installRetry": "Retry"
 }
