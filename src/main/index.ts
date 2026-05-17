@@ -48,6 +48,10 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async () => {
     return []
   })
+
+  ipcMain.handle(IpcChannels.GET_LOCALE, () => {
+    return app.getLocale()
+  })
 }
 
 app.whenReady().then(() => {
