@@ -142,7 +142,26 @@ export function ProjectScreen({
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar tree={tree} selectedPath={selectedItem?.fullPath ?? null} onSelect={handleSelect} />
+        <Sidebar
+          tree={tree}
+          selectedPath={selectedItem?.fullPath ?? null}
+          onSelect={handleSelect}
+          projectPath={project.path}
+          themeManifest={themeManifest}
+          onPageCreated={() => {}}
+          onPageRenamed={(oldPath, _newPath) => {
+            if (selectedItem?.fullPath === oldPath) {
+              setSelectedItem(null)
+              setEditorContent(null)
+            }
+          }}
+          onPageDeleted={(path) => {
+            if (selectedItem?.fullPath === path) {
+              setSelectedItem(null)
+              setEditorContent(null)
+            }
+          }}
+        />
 
         <main className="flex flex-1 overflow-hidden">
           {selectedItem && editorContent !== null ? (

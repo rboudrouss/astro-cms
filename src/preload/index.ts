@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, CreatePageOptions, CreatePageResult, InternalLinkReference } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -97,7 +97,17 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.DEV_SERVER_OUTPUT, handler)
     }
-  }
+  },
+  createPage: (options: CreatePageOptions): Promise<CreatePageResult> =>
+    ipcRenderer.invoke(IpcChannels.CREATE_PAGE, options),
+  renamePage: (filePath: string, newSlug: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.RENAME_PAGE, filePath, newSlug),
+  deletePage: (filePath: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DELETE_PAGE, filePath),
+  findInternalLinks: (projectPath: string, slug: string): Promise<InternalLinkReference[]> =>
+    ipcRenderer.invoke(IpcChannels.FIND_INTERNAL_LINKS, projectPath, slug),
+  listPageDirectories: (projectPath: string): Promise<string[]> =>
+    ipcRenderer.invoke(IpcChannels.LIST_PAGE_DIRECTORIES, projectPath)
 }
 
 export type ElectronApi = typeof api

@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, CreatePageOptions, CreatePageResult, InternalLinkReference } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -31,7 +31,12 @@ export const IpcChannels = {
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
   DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
-  DEV_SERVER_OUTPUT: 'dev-server:output'
+  DEV_SERVER_OUTPUT: 'dev-server:output',
+  CREATE_PAGE: 'page:create',
+  RENAME_PAGE: 'page:rename',
+  DELETE_PAGE: 'page:delete',
+  FIND_INTERNAL_LINKS: 'page:find-internal-links',
+  LIST_PAGE_DIRECTORIES: 'page:list-directories'
 } as const
 
 export type RecentProject = {
@@ -81,4 +86,12 @@ export type IpcHandlerMap = {
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
+  [IpcChannels.CREATE_PAGE]: { args: [options: CreatePageOptions]; return: CreatePageResult }
+  [IpcChannels.RENAME_PAGE]: { args: [filePath: string, newSlug: string]; return: string }
+  [IpcChannels.DELETE_PAGE]: { args: [filePath: string]; return: void }
+  [IpcChannels.FIND_INTERNAL_LINKS]: {
+    args: [projectPath: string, slug: string]
+    return: InternalLinkReference[]
+  }
+  [IpcChannels.LIST_PAGE_DIRECTORIES]: { args: [projectPath: string]; return: string[] }
 }

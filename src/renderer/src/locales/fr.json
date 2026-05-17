@@ -58,6 +58,37 @@
     "noBlockSelected": "Sélectionnez un bloc pour éditer ses propriétés",
     "noSchema": "Aucune propriété éditable pour ce bloc"
   },
+  "pageWizard": {
+    "title": "Nouvelle page",
+    "slug": "Nom de la page (slug)",
+    "slugPlaceholder": "ma-page",
+    "directory": "Dossier",
+    "directoryRoot": "(racine)",
+    "layout": "Layout",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "creating": "Création…",
+    "errorSlugEmpty": "Le nom de la page est requis",
+    "errorSlugInvalid": "Seules les lettres minuscules, chiffres et tirets sont autorisés",
+    "success": "Page \"{{slug}}\" créée avec succès"
+  },
+  "pageActions": {
+    "newPage": "Nouvelle page",
+    "rename": "Renommer",
+    "delete": "Supprimer",
+    "confirmDeleteTitle": "Supprimer la page",
+    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ?",
+    "confirmDeleteWithLinks": "{{count}} autre(s) page(s) contiennent des liens vers cette page. La suppression pourrait casser ces liens.",
+    "confirm": "Supprimer",
+    "cancel": "Annuler",
+    "renameTitle": "Renommer la page",
+    "renameSlug": "Nouveau nom (slug)",
+    "renameSave": "Renommer",
+    "renameCancel": "Annuler",
+    "brokenLinksWarning": "{{count}} page(s) pourraient avoir des liens cassés après ce renommage :",
+    "errorRenameFailed": "Échec du renommage",
+    "errorDeleteFailed": "Échec de la suppression"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",

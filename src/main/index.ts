@@ -16,6 +16,7 @@ import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
+import { createPage, renamePage, deletePage, findInternalLinks, listPageDirectories } from './page-manager'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -219,6 +220,29 @@ function registerIpcHandlers(): void {
     if (activeDevServer) {
       activeDevServer.restart()
     }
+  })
+
+  ipcMain.handle(IpcChannels.CREATE_PAGE, async (_event, options) => {
+    return createPage(options)
+  })
+
+  ipcMain.handle(IpcChannels.RENAME_PAGE, async (_event, filePath: string, newSlug: string) => {
+    return renamePage(filePath, newSlug)
+  })
+
+  ipcMain.handle(IpcChannels.DELETE_PAGE, async (_event, filePath: string) => {
+    await deletePage(filePath)
+  })
+
+  ipcMain.handle(
+    IpcChannels.FIND_INTERNAL_LINKS,
+    async (_event, projectPath: string, slug: string) => {
+      return findInternalLinks(projectPath, slug)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.LIST_PAGE_DIRECTORIES, async (_event, projectPath: string) => {
+    return listPageDirectories(projectPath)
   })
 }
 

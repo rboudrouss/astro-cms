@@ -148,3 +148,20 @@ export type DevServerStatus = {
   port?: number
   error?: string
 }
+
+export type CreatePageOptions = {
+  projectPath: string
+  directory: string
+  slug: string
+  layoutPath: string
+}
+
+export type CreatePageResult =
+  | { success: true; filePath: string }
+  | { success: false; error: string }
+
+export type InternalLinkReference = {
+  filePath: string
+  line: number
+  content: string
+}
