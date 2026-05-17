@@ -9,7 +9,7 @@ function renderWithI18n(lng: string) {
   const i18n = initI18n(lng)
   return render(
     <I18nextProvider i18n={i18n}>
-      <WelcomeScreen />
+      <WelcomeScreen recentProjects={[]} onOpenProject={() => {}} />
     </I18nextProvider>
   )
 }

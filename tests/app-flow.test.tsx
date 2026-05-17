@@ -1,8 +1,19 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, beforeEach } from 'vitest'
+import { I18nextProvider } from 'react-i18next'
 import { App } from '@/App'
+import { initI18n } from '@/i18n'
 import type { OpenProjectResult } from '../src/shared/types'
+
+function renderApp() {
+  const i18n = initI18n('fr')
+  return render(
+    <I18nextProvider i18n={i18n}>
+      <App />
+    </I18nextProvider>
+  )
+}
 
 describe('App flow', () => {
   beforeEach(() => {
@@ -12,7 +23,7 @@ describe('App flow', () => {
   })
 
   it('shows welcome screen initially', () => {
-    render(<App />)
+    renderApp()
     expect(screen.getByText('astro-cms')).toBeInTheDocument()
     expect(screen.getByText('Ouvrir un projet local')).toBeInTheDocument()
   })
@@ -24,7 +35,7 @@ describe('App flow', () => {
     }
     vi.mocked(window.api.openProject).mockResolvedValue(validResult)
 
-    render(<App />)
+    renderApp()
     await userEvent.click(screen.getByText('Ouvrir un projet local'))
 
     await waitFor(() => {
@@ -43,7 +54,7 @@ describe('App flow', () => {
     }
     vi.mocked(window.api.openProject).mockResolvedValue(invalidResult)
 
-    render(<App />)
+    renderApp()
     await userEvent.click(screen.getByText('Ouvrir un projet local'))
 
     await waitFor(() => {
@@ -57,7 +68,7 @@ describe('App flow', () => {
     const cancelledResult: OpenProjectResult = { status: 'cancelled' }
     vi.mocked(window.api.openProject).mockResolvedValue(cancelledResult)
 
-    render(<App />)
+    renderApp()
     await userEvent.click(screen.getByText('Ouvrir un projet local'))
 
     await waitFor(() => {
@@ -72,7 +83,7 @@ describe('App flow', () => {
       { path: '/home/user/site-b', name: 'site-b', lastOpened: '2026-05-16T10:00:00Z' }
     ])
 
-    render(<App />)
+    renderApp()
 
     await waitFor(() => {
       expect(screen.getByText('site-a')).toBeInTheDocument()
@@ -87,7 +98,7 @@ describe('App flow', () => {
     }
     vi.mocked(window.api.openProject).mockResolvedValue(validResult)
 
-    render(<App />)
+    renderApp()
     await userEvent.click(screen.getByText('Ouvrir un projet local'))
 
     await waitFor(() => {
@@ -110,7 +121,7 @@ describe('App flow', () => {
     }
     vi.mocked(window.api.openProject).mockResolvedValue(invalidResult)
 
-    render(<App />)
+    renderApp()
     await userEvent.click(screen.getByText('Ouvrir un projet local'))
 
     await waitFor(() => {
