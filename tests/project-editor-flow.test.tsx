@@ -10,9 +10,25 @@ const mockProject = {
   themeName: 'my-theme'
 }
 
+const mockTree = {
+  pages: [
+    {
+      type: 'page' as const,
+      name: 'index.mdx',
+      relativePath: 'src/pages/index.mdx',
+      fullPath: '/projects/my-site/src/pages/index.mdx'
+    }
+  ],
+  collections: []
+}
+
 describe('ProjectScreen with raw editor', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(window.api.scanProject as ReturnType<typeof vi.fn>).mockResolvedValue(mockTree)
+    ;(window.api.watchProject as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(window.api.unwatchProject as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(window.api.onProjectTreeChanged as ReturnType<typeof vi.fn>).mockReturnValue(vi.fn())
     ;(window.api.readPageContent as ReturnType<typeof vi.fn>).mockResolvedValue(
       '---\ntitle: Home\n---\n\n# Welcome\n'
     )
@@ -22,20 +38,27 @@ describe('ProjectScreen with raw editor', () => {
     return render(<I18nextProvider i18n={i18n}>{ui}</I18nextProvider>)
   }
 
-  it('shows an "open page" button', () => {
+  it('shows pages in the sidebar', async () => {
     renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
-    expect(screen.getByText(/ouvrir.*page|open.*page/i)).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('index.mdx')).toBeInTheDocument()
+    })
   })
 
-  it('opens raw editor when a page file path is provided', async () => {
+  it('opens raw editor when a page is selected from sidebar', async () => {
     const user = userEvent.setup()
     renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
 
-    const openBtn = screen.getByText(/ouvrir.*page|open.*page/i)
-    await user.click(openBtn)
+    await waitFor(() => {
+      expect(screen.getByText('index.mdx')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByText('index.mdx'))
 
     await waitFor(() => {
-      expect(window.api.readPageContent).toHaveBeenCalled()
+      expect(window.api.readPageContent).toHaveBeenCalledWith(
+        '/projects/my-site/src/pages/index.mdx'
+      )
     })
 
     await waitFor(() => {
@@ -47,8 +70,11 @@ describe('ProjectScreen with raw editor', () => {
     const user = userEvent.setup()
     renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
 
-    const openBtn = screen.getByText(/ouvrir.*page|open.*page/i)
-    await user.click(openBtn)
+    await waitFor(() => {
+      expect(screen.getByText('index.mdx')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByText('index.mdx'))
 
     await waitFor(() => {
       expect(screen.getByRole('textbox')).toBeInTheDocument()
