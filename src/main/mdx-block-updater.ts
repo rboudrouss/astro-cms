@@ -2,12 +2,10 @@ import { parseMdx, writeMdx } from './mdx-parser'
 import type { Root } from 'mdast'
 import type { MdxJsxFlowElement, MdxJsxAttribute, MdxJsxAttributeValueExpression } from 'mdast-util-mdx-jsx'
 
-type JsxNode = MdxJsxFlowElement & { children: (Root['children'][number] | MdxJsxFlowElement)[] }
-
-function findBlock(nodes: Root['children'], blockName: string): JsxNode | null {
+function findBlock(nodes: Root['children'], blockName: string): MdxJsxFlowElement | null {
   for (const node of nodes) {
     if (node.type === 'mdxJsxFlowElement') {
-      const jsx = node as unknown as JsxNode
+      const jsx = node as MdxJsxFlowElement
       if (jsx.name === blockName) return jsx
       const nested = findBlock(jsx.children as Root['children'], blockName)
       if (nested) return nested
@@ -17,18 +15,14 @@ function findBlock(nodes: Root['children'], blockName: string): JsxNode | null {
 }
 
 function readAttrValue(attr: MdxJsxAttribute): unknown {
-  if (attr.value === null || attr.value === undefined) return true
+  if (attr.value == null) return true
   if (typeof attr.value === 'string') return attr.value
-  const expr = attr.value as MdxJsxAttributeValueExpression
-  if (expr.type === 'mdxJsxAttributeValueExpression') {
-    const raw = expr.value
-    if (raw === 'true') return true
-    if (raw === 'false') return false
-    const num = Number(raw)
-    if (!isNaN(num)) return num
-    return raw
-  }
-  return String(attr.value)
+  const raw = attr.value.value
+  if (raw === 'true') return true
+  if (raw === 'false') return false
+  const num = Number(raw)
+  if (!isNaN(num)) return num
+  return raw
 }
 
 function makeAttr(name: string, value: unknown): MdxJsxAttribute {

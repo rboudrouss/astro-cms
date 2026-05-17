@@ -34,9 +34,10 @@ export function PropEditorPanel({
     setLocal(values)
   }, [values])
 
-  const handleChange = (name: string, value: unknown, type: string): void => {
+  const handleChange = (name: string, value: unknown): void => {
     const next = { ...local }
-    if (type === 'number') {
+    const isNumber = schema.find((p) => p.name === name)?.type === 'number'
+    if (isNumber) {
       next[name] = value === '' ? undefined : Number(value)
     } else {
       next[name] = value
@@ -59,7 +60,7 @@ export function PropEditorPanel({
                 <input
                   type="checkbox"
                   checked={!!value}
-                  onChange={(e) => handleChange(prop.name, e.target.checked, 'boolean')}
+                  onChange={(e) => handleChange(prop.name, e.target.checked)}
                 />
                 {prop.name}
               </label>
@@ -84,7 +85,7 @@ export function PropEditorPanel({
                 className="rounded border px-2 py-1 text-sm"
                 rows={3}
                 value={typeof value === 'string' ? value : ''}
-                onChange={(e) => handleChange(prop.name, e.target.value, 'string')}
+                onChange={(e) => handleChange(prop.name, e.target.value)}
               />
             </div>
           )
@@ -105,7 +106,7 @@ export function PropEditorPanel({
               type={inputType}
               className="rounded border px-2 py-1 text-sm"
               value={value != null ? String(value) : ''}
-              onChange={(e) => handleChange(prop.name, e.target.value, inputType)}
+              onChange={(e) => handleChange(prop.name, e.target.value)}
             />
           </div>
         )
