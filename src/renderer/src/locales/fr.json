@@ -58,6 +58,13 @@
     "noBlockSelected": "Sélectionnez un bloc pour éditer ses propriétés",
     "noSchema": "Aucune propriété éditable pour ce bloc"
   },
+  "imageLibrary": {
+    "title": "Bibliothèque d'images",
+    "search": "Rechercher des images...",
+    "noImages": "Aucune image trouvée",
+    "library": "Bibliothèque",
+    "upload": "Uploader"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",

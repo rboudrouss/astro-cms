@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, AssetInfo } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -97,7 +97,13 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.DEV_SERVER_OUTPUT, handler)
     }
-  }
+  },
+  scanAssets: (uploadsDir: string): Promise<AssetInfo[]> =>
+    ipcRenderer.invoke(IpcChannels.SCAN_ASSETS, uploadsDir),
+  uploadAsset: (sourcePath: string, uploadsDir: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPLOAD_ASSET, sourcePath, uploadsDir),
+  selectImageFile: (): Promise<string | null> =>
+    ipcRenderer.invoke(IpcChannels.SELECT_IMAGE_FILE)
 }
 
 export type ElectronApi = typeof api

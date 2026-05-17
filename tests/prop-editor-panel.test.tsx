@@ -157,7 +157,22 @@ describe('PropEditorPanel', () => {
       expect(screen.getByLabelText('content').tagName).toBe('TEXTAREA')
     })
 
-    it('renders a stub label for image format hint', () => {
+    it('renders image picker for image format hint when projectPath is provided', () => {
+      render(
+        <PropEditorPanel
+          blockName="ImageText"
+          schema={imageTextSchema}
+          cmsHints={imageTextHints}
+          values={{ image: '/hero.png', text: 'Welcome', reversed: true }}
+          onChange={vi.fn()}
+          projectPath="/project"
+        />
+      )
+
+      expect(screen.getByTestId('image-prop-field')).toBeInTheDocument()
+    })
+
+    it('falls back to text input for image format hint without projectPath', () => {
       render(
         <PropEditorPanel
           blockName="ImageText"

@@ -29,7 +29,10 @@ Object.defineProperty(window, 'api', {
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),
     onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
-    onDevServerOutput: vi.fn().mockReturnValue(vi.fn())
+    onDevServerOutput: vi.fn().mockReturnValue(vi.fn()),
+    scanAssets: vi.fn().mockResolvedValue([]),
+    uploadAsset: vi.fn().mockResolvedValue('uploaded.png'),
+    selectImageFile: vi.fn().mockResolvedValue(null)
   },
   writable: true,
   configurable: true

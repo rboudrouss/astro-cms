@@ -16,6 +16,7 @@ import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
+import { scanAssets, uploadAsset } from './asset-manager'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -219,6 +220,31 @@ function registerIpcHandlers(): void {
     if (activeDevServer) {
       activeDevServer.restart()
     }
+  })
+
+  ipcMain.handle(IpcChannels.SCAN_ASSETS, async (_event, uploadsDir: string) => {
+    return scanAssets(uploadsDir)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPLOAD_ASSET,
+    async (_event, sourcePath: string, uploadsDir: string) => {
+      return uploadAsset(sourcePath, uploadsDir)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.SELECT_IMAGE_FILE, async (): Promise<string | null> => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'Images',
+          extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif']
+        }
+      ]
+    })
+    if (result.canceled || !result.filePaths[0]) return null
+    return result.filePaths[0]
   })
 }
 
