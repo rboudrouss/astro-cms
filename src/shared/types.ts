@@ -136,11 +136,8 @@ export type BlockSelection = {
   blockPath: string
 }
 
-export type BlockSelectionMessage = {
+export type BlockSelectionMessage = BlockSelection & {
   type: 'astro-cms:block-selected'
-  blockId: string
-  blockName: string
-  blockPath: string
 }
 
 export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'

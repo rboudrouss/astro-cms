@@ -57,9 +57,12 @@ describe('Block selection via iframe postMessage', () => {
     )
   })
 
-  it('shows block info bar when a block-selected message is received', async () => {
+  async function renderWithPreview(
+    tree = mockTree
+  ): Promise<ReturnType<typeof userEvent.setup>> {
     const user = userEvent.setup()
     const { setStatus } = setupRunningDevServer()
+    ;(window.api.scanProject as ReturnType<typeof vi.fn>).mockResolvedValue(tree)
 
     renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
 
@@ -75,18 +78,28 @@ describe('Block selection via iframe postMessage', () => {
       expect(screen.getByTestId('preview-iframe')).toBeInTheDocument()
     })
 
+    return user
+  }
+
+  function selectBlock(blockName: string, blockPath: string): void {
     act(() => {
       window.dispatchEvent(
         new MessageEvent('message', {
           data: {
             type: 'astro-cms:block-selected',
-            blockId: 'ImageText',
-            blockName: 'ImageText',
-            blockPath: 'blocks/ImageText.astro'
+            blockId: blockName,
+            blockName,
+            blockPath
           }
         })
       )
     })
+  }
+
+  it('shows block info bar when a block-selected message is received', async () => {
+    await renderWithPreview()
+
+    selectBlock('ImageText', 'blocks/ImageText.astro')
 
     await waitFor(() => {
       expect(screen.getByTestId('block-info-bar')).toBeInTheDocument()
@@ -95,52 +108,15 @@ describe('Block selection via iframe postMessage', () => {
   })
 
   it('updates block info bar when a different block is selected', async () => {
-    const user = userEvent.setup()
-    const { setStatus } = setupRunningDevServer()
+    await renderWithPreview()
 
-    renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
-
-    setStatus({ state: 'running', url: 'http://localhost:4321/', port: 4321 })
-
-    await waitFor(() => {
-      expect(screen.getByText('index.mdx')).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByText('index.mdx'))
-
-    await waitFor(() => {
-      expect(screen.getByTestId('preview-iframe')).toBeInTheDocument()
-    })
-
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent('message', {
-          data: {
-            type: 'astro-cms:block-selected',
-            blockId: 'ImageText',
-            blockName: 'ImageText',
-            blockPath: 'blocks/ImageText.astro'
-          }
-        })
-      )
-    })
+    selectBlock('ImageText', 'blocks/ImageText.astro')
 
     await waitFor(() => {
       expect(screen.getByTestId('block-info-bar')).toHaveTextContent('ImageText')
     })
 
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent('message', {
-          data: {
-            type: 'astro-cms:block-selected',
-            blockId: 'Section',
-            blockName: 'Section',
-            blockPath: 'blocks/Section.astro'
-          }
-        })
-      )
-    })
+    selectBlock('Section', 'blocks/Section.astro')
 
     await waitFor(() => {
       expect(screen.getByTestId('block-info-bar')).toHaveTextContent('Section')
@@ -148,30 +124,12 @@ describe('Block selection via iframe postMessage', () => {
   })
 
   it('does not show block info bar before any block is selected', async () => {
-    const user = userEvent.setup()
-    const { setStatus } = setupRunningDevServer()
-
-    renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
-
-    setStatus({ state: 'running', url: 'http://localhost:4321/', port: 4321 })
-
-    await waitFor(() => {
-      expect(screen.getByText('index.mdx')).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByText('index.mdx'))
-
-    await waitFor(() => {
-      expect(screen.getByTestId('preview-iframe')).toBeInTheDocument()
-    })
+    await renderWithPreview()
 
     expect(screen.queryByTestId('block-info-bar')).not.toBeInTheDocument()
   })
 
   it('clears block selection when a different page is selected', async () => {
-    const user = userEvent.setup()
-    const { setStatus } = setupRunningDevServer()
-
     const twoPageTree = {
       pages: [
         {
@@ -189,34 +147,10 @@ describe('Block selection via iframe postMessage', () => {
       ],
       collections: []
     }
-    ;(window.api.scanProject as ReturnType<typeof vi.fn>).mockResolvedValue(twoPageTree)
 
-    renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
+    const user = await renderWithPreview(twoPageTree)
 
-    setStatus({ state: 'running', url: 'http://localhost:4321/', port: 4321 })
-
-    await waitFor(() => {
-      expect(screen.getByText('index.mdx')).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByText('index.mdx'))
-
-    await waitFor(() => {
-      expect(screen.getByTestId('preview-iframe')).toBeInTheDocument()
-    })
-
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent('message', {
-          data: {
-            type: 'astro-cms:block-selected',
-            blockId: 'ImageText',
-            blockName: 'ImageText',
-            blockPath: 'blocks/ImageText.astro'
-          }
-        })
-      )
-    })
+    selectBlock('ImageText', 'blocks/ImageText.astro')
 
     await waitFor(() => {
       expect(screen.getByTestId('block-info-bar')).toBeInTheDocument()
@@ -230,22 +164,7 @@ describe('Block selection via iframe postMessage', () => {
   })
 
   it('ignores messages that are not block-selected events', async () => {
-    const user = userEvent.setup()
-    const { setStatus } = setupRunningDevServer()
-
-    renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
-
-    setStatus({ state: 'running', url: 'http://localhost:4321/', port: 4321 })
-
-    await waitFor(() => {
-      expect(screen.getByText('index.mdx')).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByText('index.mdx'))
-
-    await waitFor(() => {
-      expect(screen.getByTestId('preview-iframe')).toBeInTheDocument()
-    })
+    await renderWithPreview()
 
     act(() => {
       window.dispatchEvent(
@@ -259,35 +178,9 @@ describe('Block selection via iframe postMessage', () => {
   })
 
   it('shows block path in the info bar', async () => {
-    const user = userEvent.setup()
-    const { setStatus } = setupRunningDevServer()
+    await renderWithPreview()
 
-    renderWithI18n(<ProjectScreen project={mockProject} onBack={vi.fn()} />)
-
-    setStatus({ state: 'running', url: 'http://localhost:4321/', port: 4321 })
-
-    await waitFor(() => {
-      expect(screen.getByText('index.mdx')).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByText('index.mdx'))
-
-    await waitFor(() => {
-      expect(screen.getByTestId('preview-iframe')).toBeInTheDocument()
-    })
-
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent('message', {
-          data: {
-            type: 'astro-cms:block-selected',
-            blockId: 'ImageText',
-            blockName: 'ImageText',
-            blockPath: 'blocks/ImageText.astro'
-          }
-        })
-      )
-    })
+    selectBlock('ImageText', 'blocks/ImageText.astro')
 
     await waitFor(() => {
       expect(screen.getByTestId('block-info-bar')).toHaveTextContent('blocks/ImageText.astro')
