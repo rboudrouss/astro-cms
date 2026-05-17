@@ -6,7 +6,7 @@ import {
   type UpdateInfo,
   type UpdateError
 } from '../src/shared/ipc'
-import type { OpenProjectResult } from '../src/shared/types'
+import type { OpenProjectResult, DepsCheckResult, DepsInstallResult } from '../src/shared/types'
 import type { ValidationReport } from '../src/shared/validation'
 
 describe('IPC channel definitions', () => {
@@ -23,6 +23,12 @@ describe('IPC channel definitions', () => {
     expect(IpcChannels.UPDATE_DOWNLOADED).toBe('update:downloaded')
     expect(IpcChannels.UPDATE_ERROR).toBe('update:error')
     expect(IpcChannels.UPDATE_INSTALL_AND_RESTART).toBe('update:install-and-restart')
+  })
+
+  it('defines dependency install channels', () => {
+    expect(IpcChannels.DEPS_CHECK_NEEDED).toBe('deps:check-needed')
+    expect(IpcChannels.DEPS_INSTALL).toBe('deps:install')
+    expect(IpcChannels.DEPS_INSTALL_OUTPUT).toBe('deps:install-output')
   })
 
   it('has correct type shape for RecentProject', () => {
@@ -66,6 +72,14 @@ describe('IPC channel definitions', () => {
     expectTypeOf<IpcHandlerMap[typeof IpcChannels.VALIDATE_PROJECT]>().toMatchTypeOf<{
       args: [path: string]
       return: ValidationReport
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEPS_CHECK_NEEDED]>().toMatchTypeOf<{
+      args: [path: string]
+      return: DepsCheckResult
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEPS_INSTALL]>().toMatchTypeOf<{
+      args: [path: string]
+      return: DepsInstallResult
     }>()
   })
 })

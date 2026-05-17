@@ -7,6 +7,7 @@ import { validateProject as validateProjectOpen } from './project-validator'
 import { validateProject as validateProjectReport } from './modules/project-validator'
 import { RecentProjectsStore } from './recent-projects'
 import { setupAutoUpdater, installAndRestart } from './updater'
+import { needsInstall, detectPackageManager, installDependencies } from './dependency-installer'
 
 let recentProjectsStore: RecentProjectsStore
 
@@ -79,6 +80,18 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.VALIDATE_PROJECT, async (_event, path: string) => {
     return validateProjectReport(path)
+  })
+
+  ipcMain.handle(IpcChannels.DEPS_CHECK_NEEDED, async (_event, path: string) => {
+    const needed = await needsInstall(path)
+    if (!needed) return { needed: false }
+    const pm = await detectPackageManager(path)
+    return { needed: true, packageManager: pm }
+  })
+
+  ipcMain.handle(IpcChannels.DEPS_INSTALL, async (event, path: string) => {
+    const pm = await detectPackageManager(path)
+    return installDependencies(path, pm, event.sender)
   })
 }
 

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult } from '../shared/types'
+import type { OpenProjectResult, DepsCheckResult, DepsInstallResult } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -24,7 +24,19 @@ const api = {
     }
   },
   installAndRestart: (): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.UPDATE_INSTALL_AND_RESTART)
+    ipcRenderer.invoke(IpcChannels.UPDATE_INSTALL_AND_RESTART),
+  checkDepsNeeded: (path: string): Promise<DepsCheckResult> =>
+    ipcRenderer.invoke(IpcChannels.DEPS_CHECK_NEEDED, path),
+  installDeps: (path: string): Promise<DepsInstallResult> =>
+    ipcRenderer.invoke(IpcChannels.DEPS_INSTALL, path),
+  onDepsInstallOutput: (callback: (data: { line: string }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { line: string }): void =>
+      callback(data)
+    ipcRenderer.on(IpcChannels.DEPS_INSTALL_OUTPUT, handler)
+    return () => {
+      ipcRenderer.removeListener(IpcChannels.DEPS_INSTALL_OUTPUT, handler)
+    }
+  }
 }
 
 export type ElectronApi = typeof api

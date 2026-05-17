@@ -9,7 +9,10 @@ Object.defineProperty(window, 'api', {
     getLocale: vi.fn().mockResolvedValue('fr'),
     validateProject: vi.fn().mockResolvedValue({ valid: true, projectPath: '', issues: [] }),
     onUpdateDownloaded: vi.fn().mockReturnValue(vi.fn()),
-    installAndRestart: vi.fn().mockResolvedValue(undefined)
+    installAndRestart: vi.fn().mockResolvedValue(undefined),
+    checkDepsNeeded: vi.fn().mockResolvedValue({ needed: false }),
+    installDeps: vi.fn().mockResolvedValue({ success: true, packageManager: 'npm' }),
+    onDepsInstallOutput: vi.fn().mockReturnValue(vi.fn())
   },
   writable: true,
   configurable: true

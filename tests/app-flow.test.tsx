@@ -20,6 +20,12 @@ describe('App flow', () => {
     vi.mocked(window.api.openProject).mockReset()
     vi.mocked(window.api.getRecentProjects).mockReset()
     vi.mocked(window.api.getRecentProjects).mockResolvedValue([])
+    vi.mocked(window.api.checkDepsNeeded).mockReset()
+    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue({ needed: false })
+    vi.mocked(window.api.installDeps).mockReset()
+    vi.mocked(window.api.installDeps).mockResolvedValue({ success: true, packageManager: 'npm' })
+    vi.mocked(window.api.onDepsInstallOutput).mockReset()
+    vi.mocked(window.api.onDepsInstallOutput).mockReturnValue(vi.fn())
   })
 
   it('shows welcome screen initially', () => {
@@ -109,6 +115,81 @@ describe('App flow', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Ouvrir un projet local')).toBeInTheDocument()
+    })
+  })
+
+  it('shows installing screen when node_modules is missing', async () => {
+    const validResult: OpenProjectResult = {
+      status: 'valid',
+      project: { name: 'mon-site', path: '/home/user/mon-site', themeName: 'psu-theme' }
+    }
+    vi.mocked(window.api.openProject).mockResolvedValue(validResult)
+    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue({ needed: true, packageManager: 'pnpm' })
+    vi.mocked(window.api.installDeps).mockReturnValue(new Promise(() => {}))
+
+    renderApp()
+    await userEvent.click(screen.getByText('Ouvrir un projet local'))
+
+    await waitFor(() => {
+      expect(screen.getByText(/Installation via/)).toBeInTheDocument()
+    })
+  })
+
+  it('proceeds to project screen after successful install', async () => {
+    const validResult: OpenProjectResult = {
+      status: 'valid',
+      project: { name: 'mon-site', path: '/home/user/mon-site', themeName: 'psu-theme' }
+    }
+    vi.mocked(window.api.openProject).mockResolvedValue(validResult)
+    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue({ needed: true, packageManager: 'pnpm' })
+    vi.mocked(window.api.installDeps).mockResolvedValue({ success: true, packageManager: 'pnpm' })
+
+    renderApp()
+    await userEvent.click(screen.getByText('Ouvrir un projet local'))
+
+    await waitFor(() => {
+      expect(screen.getByText('mon-site')).toBeInTheDocument()
+      expect(screen.getByText('psu-theme')).toBeInTheDocument()
+    })
+  })
+
+  it('skips install screen when node_modules exists', async () => {
+    const validResult: OpenProjectResult = {
+      status: 'valid',
+      project: { name: 'mon-site', path: '/home/user/mon-site', themeName: 'psu-theme' }
+    }
+    vi.mocked(window.api.openProject).mockResolvedValue(validResult)
+    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue(false)
+
+    renderApp()
+    await userEvent.click(screen.getByText('Ouvrir un projet local'))
+
+    await waitFor(() => {
+      expect(screen.getByText('mon-site')).toBeInTheDocument()
+      expect(screen.getByText('psu-theme')).toBeInTheDocument()
+    })
+    expect(window.api.installDeps).not.toHaveBeenCalled()
+  })
+
+  it('shows error in installing screen when install fails', async () => {
+    const validResult: OpenProjectResult = {
+      status: 'valid',
+      project: { name: 'mon-site', path: '/home/user/mon-site', themeName: 'psu-theme' }
+    }
+    vi.mocked(window.api.openProject).mockResolvedValue(validResult)
+    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue({ needed: true, packageManager: 'pnpm' })
+    vi.mocked(window.api.installDeps).mockResolvedValue({
+      success: false,
+      error: 'pnpm install exited with code 1',
+      packageManager: 'pnpm'
+    })
+
+    renderApp()
+    await userEvent.click(screen.getByText('Ouvrir un projet local'))
+
+    await waitFor(() => {
+      expect(screen.getByText("Échec de l'installation")).toBeInTheDocument()
+      expect(screen.getByText('pnpm install exited with code 1')).toBeInTheDocument()
     })
   })
 

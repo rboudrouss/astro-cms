@@ -5,5 +5,10 @@
   "newProject": "New project",
   "recentProjects": "Recent projects",
   "noRecentProjects": "No recent projects",
-  "language": "Language"
+  "language": "Language",
+  "installingDeps": "Installing dependencies…",
+  "installingDepsUsing": "Installing via {{pm}}…",
+  "installSuccess": "Installation complete",
+  "installError": "Installation failed",
+  "installRetry": "Retry"
 }

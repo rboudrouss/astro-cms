@@ -17,3 +17,13 @@ export type OpenProjectResult =
   | { status: 'cancelled' }
   | { status: 'valid'; project: ProjectInfo }
   | { status: 'invalid'; errors: ValidationError[] }
+
+export type PackageManager = 'pnpm' | 'npm' | 'yarn'
+
+export type DepsCheckResult =
+  | { needed: false }
+  | { needed: true; packageManager: PackageManager }
+
+export type DepsInstallResult =
+  | { success: true; packageManager: PackageManager }
+  | { success: false; error: string; packageManager: PackageManager }

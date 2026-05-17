@@ -1,4 +1,4 @@
-import type { OpenProjectResult } from './types'
+import type { OpenProjectResult, DepsCheckResult, DepsInstallResult } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -11,7 +11,10 @@ export const IpcChannels = {
   UPDATE_AVAILABLE: 'update:available',
   UPDATE_DOWNLOADED: 'update:downloaded',
   UPDATE_ERROR: 'update:error',
-  UPDATE_INSTALL_AND_RESTART: 'update:install-and-restart'
+  UPDATE_INSTALL_AND_RESTART: 'update:install-and-restart',
+  DEPS_CHECK_NEEDED: 'deps:check-needed',
+  DEPS_INSTALL: 'deps:install',
+  DEPS_INSTALL_OUTPUT: 'deps:install-output'
 } as const
 
 export type RecentProject = {
@@ -37,4 +40,6 @@ export type IpcHandlerMap = {
   [IpcChannels.GET_LOCALE]: { args: []; return: string }
   [IpcChannels.VALIDATE_PROJECT]: { args: [path: string]; return: ValidationReport }
   [IpcChannels.UPDATE_INSTALL_AND_RESTART]: { args: []; return: void }
+  [IpcChannels.DEPS_CHECK_NEEDED]: { args: [path: string]; return: DepsCheckResult }
+  [IpcChannels.DEPS_INSTALL]: { args: [path: string]; return: DepsInstallResult }
 }
