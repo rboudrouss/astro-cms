@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import { IpcChannels, type IpcHandlerMap } from '../shared/ipc'
+import { IpcChannels } from '../shared/ipc'
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -45,7 +45,7 @@ function registerIpcHandlers(): void {
     return null
   })
 
-  ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async (): Promise<IpcHandlerMap[typeof IpcChannels.GET_RECENT_PROJECTS]['return']> => {
+  ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async () => {
     return []
   })
 }
