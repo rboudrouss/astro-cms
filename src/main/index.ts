@@ -16,6 +16,8 @@ import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
+import { loadCollectionSchema } from './collection-schema-parser'
+import { createEntry, deleteEntry, updateEntryFrontmatter } from './entry-manager'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -220,6 +222,31 @@ function registerIpcHandlers(): void {
       activeDevServer.restart()
     }
   })
+
+  ipcMain.handle(
+    IpcChannels.GET_COLLECTION_SCHEMA,
+    async (_event, projectPath: string, collectionName: string) => {
+      return loadCollectionSchema(projectPath, collectionName)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.CREATE_ENTRY,
+    async (_event, projectPath: string, collectionName: string, slug: string, frontmatter: Record<string, unknown>) => {
+      return createEntry(projectPath, collectionName, slug, frontmatter)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.DELETE_ENTRY, async (_event, filePath: string) => {
+    await deleteEntry(filePath)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPDATE_ENTRY_FRONTMATTER,
+    async (_event, filePath: string, frontmatter: Record<string, unknown>) => {
+      await updateEntryFrontmatter(filePath, frontmatter)
+    }
+  )
 }
 
 app.whenReady().then(() => {

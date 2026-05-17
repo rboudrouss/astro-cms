@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, CollectionSchema, CreateEntryResult, EntryNode } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -31,7 +31,11 @@ export const IpcChannels = {
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
   DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
-  DEV_SERVER_OUTPUT: 'dev-server:output'
+  DEV_SERVER_OUTPUT: 'dev-server:output',
+  GET_COLLECTION_SCHEMA: 'collection:get-schema',
+  CREATE_ENTRY: 'entry:create',
+  DELETE_ENTRY: 'entry:delete',
+  UPDATE_ENTRY_FRONTMATTER: 'entry:update-frontmatter'
 } as const
 
 export type RecentProject = {
@@ -81,4 +85,20 @@ export type IpcHandlerMap = {
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
+  [IpcChannels.GET_COLLECTION_SCHEMA]: {
+    args: [projectPath: string, collectionName: string]
+    return: CollectionSchema | null
+  }
+  [IpcChannels.CREATE_ENTRY]: {
+    args: [projectPath: string, collectionName: string, slug: string, frontmatter: Record<string, unknown>]
+    return: CreateEntryResult
+  }
+  [IpcChannels.DELETE_ENTRY]: {
+    args: [filePath: string]
+    return: void
+  }
+  [IpcChannels.UPDATE_ENTRY_FRONTMATTER]: {
+    args: [filePath: string, frontmatter: Record<string, unknown>]
+    return: void
+  }
 }

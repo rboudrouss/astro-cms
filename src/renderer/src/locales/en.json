@@ -64,5 +64,25 @@
     "error": "Error",
     "stopped": "Stopped",
     "waiting": "Waiting for dev server…"
+  },
+  "entryEditor": {
+    "title": "Entry: {{name}}",
+    "newEntry": "New entry",
+    "newEntryTitle": "New entry in {{collection}}",
+    "slug": "Slug (filename)",
+    "slugPlaceholder": "my-entry",
+    "create": "Create",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this entry?",
+    "deleteConfirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "deleteConfirmYes": "Delete",
+    "deleteConfirmNo": "Cancel",
+    "noSchema": "No schema found for this collection",
+    "body": "Content (MDX body)",
+    "frontmatter": "Fields",
+    "saving": "Saving…",
+    "slugRequired": "Slug is required",
+    "slugInvalid": "Slug can only contain lowercase letters, numbers and hyphens"
   }
 }

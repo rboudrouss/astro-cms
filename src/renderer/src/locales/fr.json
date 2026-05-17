@@ -64,5 +64,25 @@
     "error": "Erreur",
     "stopped": "Arrêté",
     "waiting": "En attente du serveur de dev…"
+  },
+  "entryEditor": {
+    "title": "Entrée : {{name}}",
+    "newEntry": "Nouvelle entrée",
+    "newEntryTitle": "Nouvelle entrée dans {{collection}}",
+    "slug": "Slug (nom de fichier)",
+    "slugPlaceholder": "mon-entree",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer cette entrée ?",
+    "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer « {{name}} » ? Cette action est irréversible.",
+    "deleteConfirmYes": "Supprimer",
+    "deleteConfirmNo": "Annuler",
+    "noSchema": "Aucun schéma trouvé pour cette collection",
+    "body": "Contenu (corps MDX)",
+    "frontmatter": "Champs",
+    "saving": "Enregistrement…",
+    "slugRequired": "Le slug est requis",
+    "slugInvalid": "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets"
   }
 }

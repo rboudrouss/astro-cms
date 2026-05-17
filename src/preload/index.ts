@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, CollectionSchema, CreateEntryResult } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -97,7 +97,20 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.DEV_SERVER_OUTPUT, handler)
     }
-  }
+  },
+  getCollectionSchema: (projectPath: string, collectionName: string): Promise<CollectionSchema | null> =>
+    ipcRenderer.invoke(IpcChannels.GET_COLLECTION_SCHEMA, projectPath, collectionName),
+  createEntry: (
+    projectPath: string,
+    collectionName: string,
+    slug: string,
+    frontmatter: Record<string, unknown>
+  ): Promise<CreateEntryResult> =>
+    ipcRenderer.invoke(IpcChannels.CREATE_ENTRY, projectPath, collectionName, slug, frontmatter),
+  deleteEntry: (filePath: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DELETE_ENTRY, filePath),
+  updateEntryFrontmatter: (filePath: string, frontmatter: Record<string, unknown>): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_ENTRY_FRONTMATTER, filePath, frontmatter)
 }
 
 export type ElectronApi = typeof api

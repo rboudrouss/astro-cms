@@ -29,7 +29,11 @@ Object.defineProperty(window, 'api', {
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),
     onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
-    onDevServerOutput: vi.fn().mockReturnValue(vi.fn())
+    onDevServerOutput: vi.fn().mockReturnValue(vi.fn()),
+    getCollectionSchema: vi.fn().mockResolvedValue(null),
+    createEntry: vi.fn().mockResolvedValue({ status: 'success', entry: { type: 'entry', name: 'new', relativePath: 'new.mdx', fullPath: '/tmp/new.mdx' } }),
+    deleteEntry: vi.fn().mockResolvedValue(undefined),
+    updateEntryFrontmatter: vi.fn().mockResolvedValue(undefined)
   },
   writable: true,
   configurable: true
