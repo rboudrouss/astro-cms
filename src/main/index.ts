@@ -7,8 +7,11 @@ import { validateProject as validateProjectOpen } from './project-validator'
 import { validateProject as validateProjectReport } from './modules/project-validator'
 import { RecentProjectsStore } from './recent-projects'
 import { setupAutoUpdater, installAndRestart } from './updater'
+import { scanProjectTree } from './project-scanner'
+import { ProjectWatcher } from './project-watcher'
 
 let recentProjectsStore: RecentProjectsStore
+let activeWatcher: ProjectWatcher | null = null
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -79,6 +82,31 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.VALIDATE_PROJECT, async (_event, path: string) => {
     return validateProjectReport(path)
+  })
+
+  ipcMain.handle(IpcChannels.SCAN_PROJECT, async (_event, path: string) => {
+    return scanProjectTree(path)
+  })
+
+  ipcMain.handle(IpcChannels.WATCH_PROJECT, async (_event, projectPath: string) => {
+    if (activeWatcher) {
+      activeWatcher.stop()
+    }
+    activeWatcher = new ProjectWatcher(projectPath, async () => {
+      const tree = await scanProjectTree(projectPath)
+      const windows = BrowserWindow.getAllWindows()
+      for (const win of windows) {
+        win.webContents.send(IpcChannels.PROJECT_TREE_CHANGED, tree)
+      }
+    })
+    activeWatcher.start()
+  })
+
+  ipcMain.handle(IpcChannels.UNWATCH_PROJECT, () => {
+    if (activeWatcher) {
+      activeWatcher.stop()
+      activeWatcher = null
+    }
   })
 }
 

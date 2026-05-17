@@ -5,5 +5,17 @@
   "newProject": "New project",
   "recentProjects": "Recent projects",
   "noRecentProjects": "No recent projects",
-  "language": "Language"
+  "language": "Language",
+  "sidebar": {
+    "pages": "Pages",
+    "collections": "Collections",
+    "empty": "No pages or collections found",
+    "editing": "Editor"
+  },
+  "projectScreen": {
+    "back": "Back",
+    "activeTheme": "Active theme",
+    "path": "Path",
+    "selectItem": "Select a page or entry to edit"
+  }
 }
