@@ -16,6 +16,11 @@ import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
+import { readVariableOverrides, writeVariableOverrides } from './config-file-updater'
+import {
+  readPageVariableOverrides,
+  writePageVariableOverrides
+} from './page-variable-overrides'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -220,6 +225,42 @@ function registerIpcHandlers(): void {
       activeDevServer.restart()
     }
   })
+
+  ipcMain.handle(
+    IpcChannels.GET_VARIABLE_OVERRIDES,
+    async (_event, projectPath: string) => {
+      const configPath = join(projectPath, 'astro-cms.config.ts')
+      const content = await readPageContent(configPath)
+      return readVariableOverrides(content)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.SET_VARIABLE_OVERRIDES,
+    async (_event, projectPath: string, overrides: Record<string, unknown>) => {
+      const configPath = join(projectPath, 'astro-cms.config.ts')
+      const content = await readPageContent(configPath)
+      const updated = writeVariableOverrides(content, overrides)
+      await writePageContent(configPath, updated)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.GET_PAGE_VARIABLE_OVERRIDES,
+    async (_event, filePath: string) => {
+      const content = await readPageContent(filePath)
+      return readPageVariableOverrides(content)
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.SET_PAGE_VARIABLE_OVERRIDES,
+    async (_event, filePath: string, overrides: Record<string, unknown>) => {
+      const content = await readPageContent(filePath)
+      const updated = writePageVariableOverrides(content, overrides)
+      await writePageContent(filePath, updated)
+    }
+  )
 }
 
 app.whenReady().then(() => {

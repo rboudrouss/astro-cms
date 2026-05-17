@@ -31,7 +31,11 @@ export const IpcChannels = {
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
   DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
-  DEV_SERVER_OUTPUT: 'dev-server:output'
+  DEV_SERVER_OUTPUT: 'dev-server:output',
+  GET_VARIABLE_OVERRIDES: 'theme:get-variable-overrides',
+  SET_VARIABLE_OVERRIDES: 'theme:set-variable-overrides',
+  GET_PAGE_VARIABLE_OVERRIDES: 'page:get-variable-overrides',
+  SET_PAGE_VARIABLE_OVERRIDES: 'page:set-variable-overrides'
 } as const
 
 export type RecentProject = {
@@ -81,4 +85,20 @@ export type IpcHandlerMap = {
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
+  [IpcChannels.GET_VARIABLE_OVERRIDES]: {
+    args: [projectPath: string]
+    return: Record<string, unknown>
+  }
+  [IpcChannels.SET_VARIABLE_OVERRIDES]: {
+    args: [projectPath: string, overrides: Record<string, unknown>]
+    return: void
+  }
+  [IpcChannels.GET_PAGE_VARIABLE_OVERRIDES]: {
+    args: [filePath: string]
+    return: Record<string, unknown>
+  }
+  [IpcChannels.SET_PAGE_VARIABLE_OVERRIDES]: {
+    args: [filePath: string, overrides: Record<string, unknown>]
+    return: void
+  }
 }

@@ -29,7 +29,11 @@ Object.defineProperty(window, 'api', {
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),
     onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
-    onDevServerOutput: vi.fn().mockReturnValue(vi.fn())
+    onDevServerOutput: vi.fn().mockReturnValue(vi.fn()),
+    getVariableOverrides: vi.fn().mockResolvedValue({}),
+    setVariableOverrides: vi.fn().mockResolvedValue(undefined),
+    getPageVariableOverrides: vi.fn().mockResolvedValue({}),
+    setPageVariableOverrides: vi.fn().mockResolvedValue(undefined)
   },
   writable: true,
   configurable: true

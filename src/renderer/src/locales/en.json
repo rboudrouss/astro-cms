@@ -64,5 +64,14 @@
     "error": "Error",
     "stopped": "Stopped",
     "waiting": "Waiting for dev server…"
+  },
+  "variableEditor": {
+    "title": "Theme Variables",
+    "source": {
+      "theme": "Theme default",
+      "project": "Project override",
+      "page": "Page override"
+    },
+    "reset": "Reset"
   }
 }

@@ -64,5 +64,14 @@
     "error": "Erreur",
     "stopped": "Arrêté",
     "waiting": "En attente du serveur de dev…"
+  },
+  "variableEditor": {
+    "title": "Variables du thème",
+    "source": {
+      "theme": "Défaut du thème",
+      "project": "Override projet",
+      "page": "Override page"
+    },
+    "reset": "Réinitialiser"
   }
 }

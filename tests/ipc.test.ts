@@ -39,6 +39,13 @@ describe('IPC channel definitions', () => {
     expect(IpcChannels.DEV_SERVER_OUTPUT).toBe('dev-server:output')
   })
 
+  it('defines variable override channels', () => {
+    expect(IpcChannels.GET_VARIABLE_OVERRIDES).toBe('theme:get-variable-overrides')
+    expect(IpcChannels.SET_VARIABLE_OVERRIDES).toBe('theme:set-variable-overrides')
+    expect(IpcChannels.GET_PAGE_VARIABLE_OVERRIDES).toBe('page:get-variable-overrides')
+    expect(IpcChannels.SET_PAGE_VARIABLE_OVERRIDES).toBe('page:set-variable-overrides')
+  })
+
   it('has correct type shape for RecentProject', () => {
     const project: RecentProject = {
       path: '/tmp/test',
@@ -99,6 +106,22 @@ describe('IPC channel definitions', () => {
     }>()
     expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEV_SERVER_RESTART]>().toMatchTypeOf<{
       args: []
+      return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.GET_VARIABLE_OVERRIDES]>().toMatchTypeOf<{
+      args: [projectPath: string]
+      return: Record<string, unknown>
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.SET_VARIABLE_OVERRIDES]>().toMatchTypeOf<{
+      args: [projectPath: string, overrides: Record<string, unknown>]
+      return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.GET_PAGE_VARIABLE_OVERRIDES]>().toMatchTypeOf<{
+      args: [filePath: string]
+      return: Record<string, unknown>
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.SET_PAGE_VARIABLE_OVERRIDES]>().toMatchTypeOf<{
+      args: [filePath: string, overrides: Record<string, unknown>]
       return: void
     }>()
   })

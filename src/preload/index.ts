@@ -97,7 +97,21 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.DEV_SERVER_OUTPUT, handler)
     }
-  }
+  },
+  getVariableOverrides: (projectPath: string): Promise<Record<string, unknown>> =>
+    ipcRenderer.invoke(IpcChannels.GET_VARIABLE_OVERRIDES, projectPath),
+  setVariableOverrides: (
+    projectPath: string,
+    overrides: Record<string, unknown>
+  ): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.SET_VARIABLE_OVERRIDES, projectPath, overrides),
+  getPageVariableOverrides: (filePath: string): Promise<Record<string, unknown>> =>
+    ipcRenderer.invoke(IpcChannels.GET_PAGE_VARIABLE_OVERRIDES, filePath),
+  setPageVariableOverrides: (
+    filePath: string,
+    overrides: Record<string, unknown>
+  ): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.SET_PAGE_VARIABLE_OVERRIDES, filePath, overrides)
 }
 
 export type ElectronApi = typeof api

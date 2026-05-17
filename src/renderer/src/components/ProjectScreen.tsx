@@ -8,6 +8,8 @@ import { DevServerIndicator } from '@/components/DevServerIndicator'
 import { PreviewPane } from '@/components/PreviewPane'
 import { BlockInfoBar } from '@/components/BlockInfoBar'
 import { PropEditorPanel } from '@/components/PropEditorPanel'
+import { VariableEditorPanel } from '@/components/VariableEditorPanel'
+import { resolveVariables } from '../../../shared/variable-resolver'
 import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
@@ -30,7 +32,10 @@ export function ProjectScreen({
   const [selectedBlock, setSelectedBlock] = useState<BlockSelection | null>(null)
   const [themeManifest, setThemeManifest] = useState<ThemeManifest | null>(null)
   const [blockProps, setBlockProps] = useState<Record<string, unknown> | null>(null)
+  const [projectOverrides, setProjectOverrides] = useState<Record<string, unknown>>({})
+  const [pageOverrides, setPageOverrides] = useState<Record<string, unknown>>({})
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const varDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
@@ -39,6 +44,8 @@ export function ProjectScreen({
     window.api.getThemeManifest(project.path).then((m) => {
       if (m) setThemeManifest(m)
     })
+
+    window.api.getVariableOverrides(project.path).then(setProjectOverrides)
 
     const unsubTree = window.api.onProjectTreeChanged(setTree)
     const unsubStatus = window.api.onDevServerStatusChanged(setDevServerStatus)
@@ -75,8 +82,43 @@ export function ProjectScreen({
     window.api.getBlockProps(selectedItem.fullPath, selectedBlock.blockName).then(setBlockProps)
   }, [selectedBlock, selectedItem])
 
+  useEffect(() => {
+    if (!selectedItem) {
+      setPageOverrides({})
+      return
+    }
+    window.api.getPageVariableOverrides(selectedItem.fullPath).then(setPageOverrides)
+  }, [selectedItem])
+
   const selectedBlockManifest: BlockManifest | undefined =
     themeManifest?.blocks.find((b) => b.name === selectedBlock?.blockName)
+
+  const resolvedVars = themeManifest
+    ? resolveVariables(themeManifest.variables, projectOverrides, pageOverrides)
+    : {}
+
+  const handleVariableChange = useCallback(
+    (name: string, value: unknown) => {
+      const next = { ...projectOverrides, [name]: value }
+      if (value === undefined) delete next[name]
+      setProjectOverrides(next)
+      if (varDebounceRef.current) clearTimeout(varDebounceRef.current)
+      varDebounceRef.current = setTimeout(() => {
+        window.api.setVariableOverrides(project.path, next)
+      }, DEBOUNCE_MS)
+    },
+    [projectOverrides, project.path]
+  )
+
+  const handleVariableReset = useCallback(
+    (name: string) => {
+      const next = { ...projectOverrides }
+      delete next[name]
+      setProjectOverrides(next)
+      window.api.setVariableOverrides(project.path, next)
+    },
+    [projectOverrides, project.path]
+  )
 
   const handleSelect = useCallback(async (item: SidebarItem) => {
     setSelectedItem(item)
@@ -115,6 +157,7 @@ export function ProjectScreen({
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (varDebounceRef.current) clearTimeout(varDebounceRef.current)
     }
   }, [])
 
@@ -143,6 +186,14 @@ export function ProjectScreen({
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar tree={tree} selectedPath={selectedItem?.fullPath ?? null} onSelect={handleSelect} />
+        {themeManifest && Object.keys(themeManifest.variables).length > 0 && (
+          <VariableEditorPanel
+            themeVariables={themeManifest.variables}
+            resolved={resolvedVars}
+            onChange={handleVariableChange}
+            onReset={handleVariableReset}
+          />
+        )}
 
         <main className="flex flex-1 overflow-hidden">
           {selectedItem && editorContent !== null ? (
