@@ -5,5 +5,25 @@
   "newProject": "Nouveau projet",
   "recentProjects": "Projets récents",
   "noRecentProjects": "Aucun projet récent",
-  "language": "Langue"
+  "language": "Langue",
+  "wizard": {
+    "title": "Nouveau projet",
+    "stepTemplate": "Choisir un template",
+    "stepConfig": "Configuration",
+    "projectName": "Nom du projet",
+    "projectNamePlaceholder": "mon-site",
+    "parentDir": "Dossier de destination",
+    "selectFolder": "Parcourir…",
+    "noFolderSelected": "Aucun dossier sélectionné",
+    "initGit": "Initialiser un dépôt git",
+    "create": "Créer le projet",
+    "creating": "Création en cours…",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "next": "Suivant",
+    "errorGeneration": "Erreur lors de la génération du projet",
+    "successTitle": "Projet créé",
+    "successMessage": "Le projet \"{{name}}\" a été créé avec succès.",
+    "openCreatedProject": "Ouvrir le projet"
+  }
 }

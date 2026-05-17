@@ -4,7 +4,9 @@ Object.defineProperty(window, 'api', {
   value: {
     openProject: vi.fn().mockResolvedValue({ status: 'cancelled' }),
     cloneProject: vi.fn().mockResolvedValue(null),
-    newProject: vi.fn().mockResolvedValue(null),
+    getTemplates: vi.fn().mockResolvedValue([]),
+    selectDirectory: vi.fn().mockResolvedValue(null),
+    newProject: vi.fn().mockResolvedValue({ status: 'cancelled' }),
     getRecentProjects: vi.fn().mockResolvedValue([]),
     getLocale: vi.fn().mockResolvedValue('fr'),
     validateProject: vi.fn().mockResolvedValue({ valid: true, projectPath: '', issues: [] }),

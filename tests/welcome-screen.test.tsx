@@ -7,7 +7,8 @@ import { initI18n } from '@/i18n'
 
 const defaultProps = {
   recentProjects: [],
-  onOpenProject: vi.fn()
+  onOpenProject: vi.fn(),
+  onNewProject: vi.fn()
 }
 
 function renderWelcomeScreen(props = defaultProps) {
@@ -51,10 +52,11 @@ describe('WelcomeScreen', () => {
     expect(window.api.cloneProject).toHaveBeenCalled()
   })
 
-  it('calls newProject when "Nouveau projet" is clicked', async () => {
-    renderWelcomeScreen()
+  it('calls onNewProject when "Nouveau projet" is clicked', async () => {
+    const onNewProject = vi.fn()
+    renderWelcomeScreen({ ...defaultProps, onNewProject })
     await userEvent.click(screen.getByText('Nouveau projet'))
-    expect(window.api.newProject).toHaveBeenCalled()
+    expect(onNewProject).toHaveBeenCalled()
   })
 
   it('displays recent projects when provided', () => {
@@ -66,6 +68,7 @@ describe('WelcomeScreen', () => {
             { path: '/tmp/proj', name: 'proj', lastOpened: '2026-05-17T10:00:00Z' }
           ]}
           onOpenProject={vi.fn()}
+          onNewProject={vi.fn()}
         />
       </I18nextProvider>
     )

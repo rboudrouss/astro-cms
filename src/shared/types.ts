@@ -17,3 +17,22 @@ export type OpenProjectResult =
   | { status: 'cancelled' }
   | { status: 'valid'; project: ProjectInfo }
   | { status: 'invalid'; errors: ValidationError[] }
+
+export type TemplateInfo = {
+  id: string
+  name: string
+  description: string
+  themeName: string
+}
+
+export type NewProjectOptions = {
+  templateId: string
+  projectName: string
+  parentDir: string
+  initGit: boolean
+}
+
+export type NewProjectResult =
+  | { status: 'success'; project: ProjectInfo }
+  | { status: 'error'; message: string }
+  | { status: 'cancelled' }

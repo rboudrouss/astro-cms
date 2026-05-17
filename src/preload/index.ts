@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -8,8 +8,12 @@ const api = {
     ipcRenderer.invoke(IpcChannels.OPEN_PROJECT),
   cloneProject: (url: string): Promise<string | null> =>
     ipcRenderer.invoke(IpcChannels.CLONE_PROJECT, url),
-  newProject: (): Promise<string | null> =>
-    ipcRenderer.invoke(IpcChannels.NEW_PROJECT),
+  getTemplates: (): Promise<TemplateInfo[]> =>
+    ipcRenderer.invoke(IpcChannels.GET_TEMPLATES),
+  selectDirectory: (): Promise<string | null> =>
+    ipcRenderer.invoke(IpcChannels.SELECT_DIRECTORY),
+  newProject: (options: NewProjectOptions): Promise<NewProjectResult> =>
+    ipcRenderer.invoke(IpcChannels.NEW_PROJECT, options),
   getRecentProjects: (): Promise<RecentProject[]> =>
     ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS),
   getLocale: (): Promise<string> =>

@@ -2,11 +2,13 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { IpcChannels } from '../shared/ipc'
-import type { OpenProjectResult } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult } from '../shared/types'
 import { validateProject as validateProjectOpen } from './project-validator'
 import { validateProject as validateProjectReport } from './modules/project-validator'
 import { RecentProjectsStore } from './recent-projects'
 import { setupAutoUpdater, installAndRestart } from './updater'
+import { getTemplates } from './templates'
+import { generateProject } from './project-generator'
 
 let recentProjectsStore: RecentProjectsStore
 
@@ -61,9 +63,29 @@ function registerIpcHandlers(): void {
     return null
   })
 
-  ipcMain.handle(IpcChannels.NEW_PROJECT, async () => {
-    return null
+  ipcMain.handle(IpcChannels.GET_TEMPLATES, () => {
+    return getTemplates()
   })
+
+  ipcMain.handle(IpcChannels.SELECT_DIRECTORY, async (): Promise<string | null> => {
+    const result = await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] })
+    if (result.canceled || !result.filePaths[0]) return null
+    return result.filePaths[0]
+  })
+
+  ipcMain.handle(
+    IpcChannels.NEW_PROJECT,
+    async (_event, options: NewProjectOptions): Promise<NewProjectResult> => {
+      const result = await generateProject(options)
+      if (result.status === 'success') {
+        await recentProjectsStore.add({
+          path: result.project.path,
+          name: result.project.name
+        })
+      }
+      return result
+    }
+  )
 
   ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async () => {
     return recentProjectsStore.load()

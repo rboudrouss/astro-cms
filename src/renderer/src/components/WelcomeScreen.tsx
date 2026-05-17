@@ -6,19 +6,17 @@ import type { RecentProject } from '../../../shared/ipc'
 
 export function WelcomeScreen({
   recentProjects,
-  onOpenProject
+  onOpenProject,
+  onNewProject
 }: {
   recentProjects: RecentProject[]
   onOpenProject: () => void
+  onNewProject: () => void
 }): React.JSX.Element {
   const { t } = useTranslation()
 
   const handleCloneProject = async (): Promise<void> => {
     await window.api.cloneProject('')
-  }
-
-  const handleNewProject = async (): Promise<void> => {
-    await window.api.newProject()
   }
 
   return (
@@ -39,7 +37,7 @@ export function WelcomeScreen({
           <GitBranch />
           {t('cloneProject')}
         </Button>
-        <Button variant="outline" size="lg" onClick={handleNewProject}>
+        <Button variant="outline" size="lg" onClick={onNewProject}>
           <Plus />
           {t('newProject')}
         </Button>
