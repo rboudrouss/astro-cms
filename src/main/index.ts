@@ -12,9 +12,12 @@ import { generateProject } from './project-generator'
 import { needsInstall, detectPackageManager, installDependencies } from './dependency-installer'
 import { ThemeHotReloader } from './theme-hot-reloader'
 import { readPageContent, writePageContent } from './page-file'
+import { scanProjectTree } from './project-scanner'
+import { ProjectWatcher } from './project-watcher'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
+let activeWatcher: ProjectWatcher | null = null
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -144,6 +147,31 @@ function registerIpcHandlers(): void {
       await writePageContent(filePath, content)
     }
   )
+
+  ipcMain.handle(IpcChannels.SCAN_PROJECT, async (_event, path: string) => {
+    return scanProjectTree(path)
+  })
+
+  ipcMain.handle(IpcChannels.WATCH_PROJECT, async (_event, projectPath: string) => {
+    if (activeWatcher) {
+      activeWatcher.stop()
+    }
+    activeWatcher = new ProjectWatcher(projectPath, async () => {
+      const tree = await scanProjectTree(projectPath)
+      const windows = BrowserWindow.getAllWindows()
+      for (const win of windows) {
+        win.webContents.send(IpcChannels.PROJECT_TREE_CHANGED, tree)
+      }
+    })
+    activeWatcher.start()
+  })
+
+  ipcMain.handle(IpcChannels.UNWATCH_PROJECT, () => {
+    if (activeWatcher) {
+      activeWatcher.stop()
+      activeWatcher = null
+    }
+  })
 }
 
 app.whenReady().then(() => {

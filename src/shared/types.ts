@@ -100,3 +100,32 @@ export type ThemeManifest = {
   layouts: LayoutManifest[]
   variables: Record<string, ThemeVariable>
 }
+
+export type PageNode = {
+  type: 'page'
+  name: string
+  relativePath: string
+  fullPath: string
+}
+
+export type EntryNode = {
+  type: 'entry'
+  name: string
+  relativePath: string
+  fullPath: string
+}
+
+export type CollectionNode = {
+  type: 'collection'
+  name: string
+  entries: EntryNode[]
+}
+
+export type ProjectTree = {
+  pages: PageNode[]
+  collections: CollectionNode[]
+}
+
+export type SidebarItem =
+  | PageNode
+  | EntryNode

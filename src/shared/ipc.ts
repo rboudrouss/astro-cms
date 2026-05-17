@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -10,6 +10,10 @@ export const IpcChannels = {
   GET_RECENT_PROJECTS: 'project:get-recent',
   GET_LOCALE: 'app:get-locale',
   VALIDATE_PROJECT: 'project:validate',
+  SCAN_PROJECT: 'project:scan',
+  WATCH_PROJECT: 'project:watch',
+  UNWATCH_PROJECT: 'project:unwatch',
+  PROJECT_TREE_CHANGED: 'project:tree-changed',
   UPDATE_AVAILABLE: 'update:available',
   UPDATE_DOWNLOADED: 'update:downloaded',
   UPDATE_ERROR: 'update:error',
@@ -47,6 +51,9 @@ export type IpcHandlerMap = {
   [IpcChannels.GET_RECENT_PROJECTS]: { args: []; return: RecentProject[] }
   [IpcChannels.GET_LOCALE]: { args: []; return: string }
   [IpcChannels.VALIDATE_PROJECT]: { args: [path: string]; return: ValidationReport }
+  [IpcChannels.SCAN_PROJECT]: { args: [path: string]; return: ProjectTree }
+  [IpcChannels.WATCH_PROJECT]: { args: [path: string]; return: void }
+  [IpcChannels.UNWATCH_PROJECT]: { args: []; return: void }
   [IpcChannels.UPDATE_INSTALL_AND_RESTART]: { args: []; return: void }
   [IpcChannels.DEPS_CHECK_NEEDED]: { args: [path: string]; return: DepsCheckResult }
   [IpcChannels.DEPS_INSTALL]: { args: [path: string]; return: DepsInstallResult }

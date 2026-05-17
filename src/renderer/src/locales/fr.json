@@ -41,5 +41,17 @@
   "back": "Retour",
   "activeTheme": "Thème actif",
   "path": "Chemin",
-  "openPage": "Ouvrir une page"
+  "openPage": "Ouvrir une page",
+  "sidebar": {
+    "pages": "Pages",
+    "collections": "Collections",
+    "empty": "Aucune page ou collection trouvée",
+    "editing": "Éditeur"
+  },
+  "projectScreen": {
+    "back": "Retour",
+    "activeTheme": "Thème actif",
+    "path": "Chemin",
+    "selectItem": "Sélectionnez une page ou une entrée pour l'éditer"
+  }
 }
