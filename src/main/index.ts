@@ -18,7 +18,7 @@ import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
 import { GitWorkflow } from './git-workflow'
 import { createSimpleGitOps } from './simple-git-ops'
-import { DEFAULT_GIT_CONFIG } from '../shared/git-types'
+import { DEFAULT_GIT_CONFIG, type GitWorkflowStatus } from '../shared/git-types'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -230,7 +230,7 @@ function registerIpcHandlers(): void {
       activeGitWorkflow.dispose()
     }
     const ops = createSimpleGitOps(projectPath)
-    const broadcast = (status: unknown): void => {
+    const broadcast = (status: GitWorkflowStatus): void => {
       for (const win of BrowserWindow.getAllWindows()) {
         win.webContents.send(IpcChannels.GIT_STATUS_CHANGED, status)
       }

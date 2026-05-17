@@ -61,7 +61,7 @@ export function createSimpleGitOps(projectPath: string): GitOps {
     async log(maxCount, ref?) {
       const opts: Record<string, unknown> = { maxCount }
       if (ref) {
-        (opts as Record<string, unknown>)[ref] = null
+        opts[ref] = null
       }
       const result = await git.log(opts)
       return result.all.map((e) => ({

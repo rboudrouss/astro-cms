@@ -14,7 +14,6 @@ export class GitWorkflow {
   }
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null
-  private readonly projectPath: string
   private readonly config: GitConfig
   private readonly ops: GitOps
   private readonly onStatusChanged: (status: GitWorkflowStatus) => void
@@ -27,7 +26,6 @@ export class GitWorkflow {
     onStatusChanged: (status: GitWorkflowStatus) => void,
     debounceMs = 500
   ) {
-    this.projectPath = projectPath
     this.config = config
     this.ops = ops
     this.onStatusChanged = onStatusChanged
