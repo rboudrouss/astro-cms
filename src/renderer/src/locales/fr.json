@@ -30,5 +30,12 @@
   "installingDepsUsing": "Installation via {{pm}}…",
   "installSuccess": "Installation terminée",
   "installError": "Échec de l'installation",
-  "installRetry": "Réessayer"
+  "installRetry": "Réessayer",
+  "blocks": "Blocs",
+  "layouts": "Layouts",
+  "noBlocks": "Aucun bloc disponible",
+  "noLayouts": "Aucun layout disponible",
+  "leaf": "Feuille",
+  "compositional": "Compositionnel",
+  "themeLoadError": "Impossible de charger le thème"
 }

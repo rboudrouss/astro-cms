@@ -30,5 +30,12 @@
   "installingDepsUsing": "Installing via {{pm}}…",
   "installSuccess": "Installation complete",
   "installError": "Installation failed",
-  "installRetry": "Retry"
+  "installRetry": "Retry",
+  "blocks": "Blocks",
+  "layouts": "Layouts",
+  "noBlocks": "No blocks available",
+  "noLayouts": "No layouts available",
+  "leaf": "Leaf",
+  "compositional": "Compositional",
+  "themeLoadError": "Failed to load theme"
 }

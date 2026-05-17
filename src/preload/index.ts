@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -39,6 +39,16 @@ const api = {
     ipcRenderer.on(IpcChannels.DEPS_INSTALL_OUTPUT, handler)
     return () => {
       ipcRenderer.removeListener(IpcChannels.DEPS_INSTALL_OUTPUT, handler)
+    }
+  },
+  getThemeManifest: (projectPath: string): Promise<ThemeManifest | null> =>
+    ipcRenderer.invoke(IpcChannels.GET_THEME_MANIFEST, projectPath),
+  onThemeManifestUpdated: (callback: (manifest: ThemeManifest) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, manifest: ThemeManifest): void =>
+      callback(manifest)
+    ipcRenderer.on(IpcChannels.THEME_MANIFEST_UPDATED, handler)
+    return () => {
+      ipcRenderer.removeListener(IpcChannels.THEME_MANIFEST_UPDATED, handler)
     }
   }
 }

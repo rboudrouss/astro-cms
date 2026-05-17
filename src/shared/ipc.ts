@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -16,7 +16,9 @@ export const IpcChannels = {
   UPDATE_INSTALL_AND_RESTART: 'update:install-and-restart',
   DEPS_CHECK_NEEDED: 'deps:check-needed',
   DEPS_INSTALL: 'deps:install',
-  DEPS_INSTALL_OUTPUT: 'deps:install-output'
+  DEPS_INSTALL_OUTPUT: 'deps:install-output',
+  GET_THEME_MANIFEST: 'theme:get-manifest',
+  THEME_MANIFEST_UPDATED: 'theme:manifest-updated'
 } as const
 
 export type RecentProject = {
@@ -46,4 +48,8 @@ export type IpcHandlerMap = {
   [IpcChannels.UPDATE_INSTALL_AND_RESTART]: { args: []; return: void }
   [IpcChannels.DEPS_CHECK_NEEDED]: { args: [path: string]; return: DepsCheckResult }
   [IpcChannels.DEPS_INSTALL]: { args: [path: string]; return: DepsInstallResult }
+  [IpcChannels.GET_THEME_MANIFEST]: {
+    args: [projectPath: string]
+    return: ThemeManifest | null
+  }
 }

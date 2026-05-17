@@ -46,3 +46,50 @@ export type DepsCheckResult =
 export type DepsInstallResult =
   | { success: true; packageManager: PackageManager }
   | { success: false; error: string; packageManager: PackageManager }
+
+export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'unknown'
+
+export type PropSchema = {
+  name: string
+  type: PropType
+  required: boolean
+  description?: string
+  default?: unknown
+}
+
+export type CmsHints = Record<string, { format?: string; [key: string]: unknown }>
+
+export type SlotInfo = {
+  name: string
+}
+
+export type BlockManifest = {
+  name: string
+  label: string
+  filePath: string
+  props: PropSchema[]
+  cmsHints: CmsHints
+  slots: SlotInfo[]
+  isCompositional: boolean
+}
+
+export type LayoutManifest = {
+  name: string
+  label: string
+  filePath: string
+  props: PropSchema[]
+  cmsHints: CmsHints
+  slots: SlotInfo[]
+}
+
+export type ThemeVariable = {
+  type: string
+  default: unknown
+}
+
+export type ThemeManifest = {
+  name: string
+  blocks: BlockManifest[]
+  layouts: LayoutManifest[]
+  variables: Record<string, ThemeVariable>
+}

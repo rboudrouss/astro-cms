@@ -1,0 +1,19 @@
+---
+interface Props {
+  title: string;
+  showNav?: boolean;
+}
+
+const { title, showNav = true } = Astro.props;
+---
+
+<html>
+  <head><title>{title}</title></head>
+  <body>
+    {showNav && <nav>Navigation</nav>}
+    <main>
+      <slot />
+    </main>
+    <footer>Footer</footer>
+  </body>
+</html>

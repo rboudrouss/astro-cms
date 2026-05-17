@@ -1,0 +1,14 @@
+---
+interface Props {
+  videoId: string;
+  autoplay?: boolean;
+}
+
+export const cmsHints = {
+  videoId: { format: "text", placeholder: "dQw4w9WgXcQ" },
+};
+
+const { videoId, autoplay = false } = Astro.props;
+---
+
+<iframe src={`https://youtube.com/embed/${videoId}?autoplay=${autoplay}`}></iframe>

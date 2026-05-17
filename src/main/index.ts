@@ -10,8 +10,10 @@ import { setupAutoUpdater, installAndRestart } from './updater'
 import { getTemplates } from './templates'
 import { generateProject } from './project-generator'
 import { needsInstall, detectPackageManager, installDependencies } from './dependency-installer'
+import { ThemeHotReloader } from './theme-hot-reloader'
 
 let recentProjectsStore: RecentProjectsStore
+let activeReloader: ThemeHotReloader | null = null
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -114,6 +116,21 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.DEPS_INSTALL, async (event, path: string) => {
     const pm = await detectPackageManager(path)
     return installDependencies(path, pm, event.sender)
+  })
+
+  ipcMain.handle(IpcChannels.GET_THEME_MANIFEST, async (_event, projectPath: string) => {
+    try {
+      if (activeReloader) await activeReloader.stop()
+      activeReloader = new ThemeHotReloader(projectPath, (updatedManifest) => {
+        const windows = BrowserWindow.getAllWindows()
+        for (const win of windows) {
+          win.webContents.send(IpcChannels.THEME_MANIFEST_UPDATED, updatedManifest)
+        }
+      })
+      return await activeReloader.start()
+    } catch {
+      return null
+    }
   })
 }
 
