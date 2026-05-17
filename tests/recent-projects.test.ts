@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { mkdtempSync, rmSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
@@ -11,10 +11,6 @@ describe('RecentProjectsStore', () => {
   beforeEach(() => {
     storeDir = mkdtempSync(join(tmpdir(), 'astro-cms-recent-'))
     store = new RecentProjectsStore(join(storeDir, 'recent-projects.json'))
-  })
-
-  afterAll(() => {
-    // cleanup happens per-test since each gets its own dir
   })
 
   it('returns empty array when no file exists', async () => {

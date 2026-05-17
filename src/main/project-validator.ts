@@ -1,6 +1,6 @@
 import { readFile, access } from 'fs/promises'
 import { join, basename } from 'path'
-import type { ValidationError, ValidationResult } from '../shared/types'
+import type { ValidationResult } from '../shared/types'
 
 const CONFIG_FILENAME = 'astro-cms.config.ts'
 const THEME_FILENAME = 'astro-cms.theme.ts'
@@ -32,8 +32,6 @@ function extractThemeName(themeContent: string): string | null {
 }
 
 export async function validateProject(dirPath: string): Promise<ValidationResult> {
-  const errors: ValidationError[] = []
-
   const configPath = join(dirPath, CONFIG_FILENAME)
   if (!(await fileExists(configPath))) {
     return {
@@ -51,31 +49,43 @@ export async function validateProject(dirPath: string): Promise<ValidationResult
   const themeImportPath = extractThemeImportPath(configContent)
 
   if (!themeImportPath) {
-    errors.push({
-      code: 'THEME_NOT_DECLARED',
-      message: `Aucun import de thème trouvé dans ${CONFIG_FILENAME}. Le fichier doit importer un fichier ${THEME_FILENAME}.`
-    })
-    return { valid: false, errors }
+    return {
+      valid: false,
+      errors: [
+        {
+          code: 'THEME_NOT_DECLARED',
+          message: `Aucun import de thème trouvé dans ${CONFIG_FILENAME}. Le fichier doit importer un fichier ${THEME_FILENAME}.`
+        }
+      ]
+    }
   }
 
   const resolvedThemePath = join(dirPath, themeImportPath)
   if (!(await fileExists(resolvedThemePath))) {
-    errors.push({
-      code: 'THEME_NOT_FOUND',
-      message: `Le fichier thème ${themeImportPath} référencé dans ${CONFIG_FILENAME} est introuvable.`
-    })
-    return { valid: false, errors }
+    return {
+      valid: false,
+      errors: [
+        {
+          code: 'THEME_NOT_FOUND',
+          message: `Le fichier thème ${themeImportPath} référencé dans ${CONFIG_FILENAME} est introuvable.`
+        }
+      ]
+    }
   }
 
   const themeContent = await readFile(resolvedThemePath, 'utf-8')
   const themeName = extractThemeName(themeContent)
 
   if (!themeName) {
-    errors.push({
-      code: 'THEME_NAME_MISSING',
-      message: `Le fichier thème ne déclare pas de champ "name" dans defineTheme().`
-    })
-    return { valid: false, errors }
+    return {
+      valid: false,
+      errors: [
+        {
+          code: 'THEME_NAME_MISSING',
+          message: `Le fichier thème ne déclare pas de champ "name" dans defineTheme().`
+        }
+      ]
+    }
   }
 
   return {

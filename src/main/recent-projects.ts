@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir } from 'fs/promises'
-import { join, dirname } from 'path'
+import { dirname } from 'path'
 import type { RecentProject } from '../shared/ipc'
 
 const MAX_RECENT = 10
