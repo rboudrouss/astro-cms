@@ -129,3 +129,12 @@ export type ProjectTree = {
 export type SidebarItem =
   | PageNode
   | EntryNode
+
+export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'
+
+export type DevServerStatus = {
+  state: DevServerState
+  url?: string
+  port?: number
+  error?: string
+}

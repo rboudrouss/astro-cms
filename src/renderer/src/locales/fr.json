@@ -53,5 +53,12 @@
     "activeTheme": "Thème actif",
     "path": "Chemin",
     "selectItem": "Sélectionnez une page ou une entrée pour l'éditer"
+  },
+  "devServer": {
+    "starting": "Démarrage…",
+    "running": "En cours",
+    "error": "Erreur",
+    "stopped": "Arrêté",
+    "waiting": "En attente du serveur de dev…"
   }
 }

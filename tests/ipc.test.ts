@@ -31,6 +31,14 @@ describe('IPC channel definitions', () => {
     expect(IpcChannels.DEPS_INSTALL_OUTPUT).toBe('deps:install-output')
   })
 
+  it('defines dev server channels', () => {
+    expect(IpcChannels.DEV_SERVER_START).toBe('dev-server:start')
+    expect(IpcChannels.DEV_SERVER_STOP).toBe('dev-server:stop')
+    expect(IpcChannels.DEV_SERVER_RESTART).toBe('dev-server:restart')
+    expect(IpcChannels.DEV_SERVER_STATUS_CHANGED).toBe('dev-server:status-changed')
+    expect(IpcChannels.DEV_SERVER_OUTPUT).toBe('dev-server:output')
+  })
+
   it('has correct type shape for RecentProject', () => {
     const project: RecentProject = {
       path: '/tmp/test',
@@ -80,6 +88,18 @@ describe('IPC channel definitions', () => {
     expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEPS_INSTALL]>().toMatchTypeOf<{
       args: [path: string]
       return: DepsInstallResult
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEV_SERVER_START]>().toMatchTypeOf<{
+      args: [projectPath: string]
+      return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEV_SERVER_STOP]>().toMatchTypeOf<{
+      args: []
+      return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.DEV_SERVER_RESTART]>().toMatchTypeOf<{
+      args: []
+      return: void
     }>()
   })
 })

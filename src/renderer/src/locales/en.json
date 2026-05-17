@@ -53,5 +53,12 @@
     "activeTheme": "Active theme",
     "path": "Path",
     "selectItem": "Select a page or entry to edit"
+  },
+  "devServer": {
+    "starting": "Starting…",
+    "running": "Running",
+    "error": "Error",
+    "stopped": "Stopped",
+    "waiting": "Waiting for dev server…"
   }
 }

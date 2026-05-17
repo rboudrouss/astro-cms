@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -67,7 +67,29 @@ const api = {
   readPageContent: (filePath: string): Promise<string> =>
     ipcRenderer.invoke(IpcChannels.READ_PAGE_CONTENT, filePath),
   writePageContent: (filePath: string, content: string): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.WRITE_PAGE_CONTENT, filePath, content)
+    ipcRenderer.invoke(IpcChannels.WRITE_PAGE_CONTENT, filePath, content),
+  startDevServer: (projectPath: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
+  stopDevServer: (): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DEV_SERVER_STOP),
+  restartDevServer: (): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DEV_SERVER_RESTART),
+  onDevServerStatusChanged: (callback: (status: DevServerStatus) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, status: DevServerStatus): void =>
+      callback(status)
+    ipcRenderer.on(IpcChannels.DEV_SERVER_STATUS_CHANGED, handler)
+    return () => {
+      ipcRenderer.removeListener(IpcChannels.DEV_SERVER_STATUS_CHANGED, handler)
+    }
+  },
+  onDevServerOutput: (callback: (data: { line: string }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { line: string }): void =>
+      callback(data)
+    ipcRenderer.on(IpcChannels.DEV_SERVER_OUTPUT, handler)
+    return () => {
+      ipcRenderer.removeListener(IpcChannels.DEV_SERVER_OUTPUT, handler)
+    }
+  }
 }
 
 export type ElectronApi = typeof api

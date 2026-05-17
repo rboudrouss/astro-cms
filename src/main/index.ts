@@ -14,10 +14,12 @@ import { ThemeHotReloader } from './theme-hot-reloader'
 import { readPageContent, writePageContent } from './page-file'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
+import { AstroDevServer } from './astro-dev-server'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
 let activeWatcher: ProjectWatcher | null = null
+let activeDevServer: AstroDevServer | null = null
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -172,6 +174,33 @@ function registerIpcHandlers(): void {
       activeWatcher = null
     }
   })
+
+  ipcMain.handle(IpcChannels.DEV_SERVER_START, (_event, projectPath: string) => {
+    if (activeDevServer) activeDevServer.stop()
+    const broadcast = (channel: string, data: unknown): void => {
+      for (const win of BrowserWindow.getAllWindows()) {
+        win.webContents.send(channel, data)
+      }
+    }
+    activeDevServer = new AstroDevServer(projectPath, {
+      sendStatus: (status) => broadcast(IpcChannels.DEV_SERVER_STATUS_CHANGED, status),
+      sendOutput: (line) => broadcast(IpcChannels.DEV_SERVER_OUTPUT, { line })
+    })
+    activeDevServer.start()
+  })
+
+  ipcMain.handle(IpcChannels.DEV_SERVER_STOP, () => {
+    if (activeDevServer) {
+      activeDevServer.stop()
+      activeDevServer = null
+    }
+  })
+
+  ipcMain.handle(IpcChannels.DEV_SERVER_RESTART, () => {
+    if (activeDevServer) {
+      activeDevServer.restart()
+    }
+  })
 }
 
 app.whenReady().then(() => {
@@ -188,6 +217,10 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  if (activeDevServer) {
+    activeDevServer.stop()
+    activeDevServer = null
+  }
   if (process.platform !== 'darwin') {
     app.quit()
   }

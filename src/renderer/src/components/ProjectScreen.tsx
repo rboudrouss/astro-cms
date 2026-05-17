@@ -4,7 +4,9 @@ import { ArrowLeft, FolderOpen, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sidebar } from '@/components/Sidebar'
 import { RawEditor } from '@/components/RawEditor'
-import type { ProjectInfo, ProjectTree, SidebarItem } from '../../../shared/types'
+import { DevServerIndicator } from '@/components/DevServerIndicator'
+import { PreviewPane } from '@/components/PreviewPane'
+import type { ProjectInfo, ProjectTree, SidebarItem, DevServerStatus } from '../../../shared/types'
 
 export function ProjectScreen({
   project,
@@ -17,16 +19,21 @@ export function ProjectScreen({
   const [tree, setTree] = useState<ProjectTree>({ pages: [], collections: [] })
   const [selectedItem, setSelectedItem] = useState<SidebarItem | null>(null)
   const [editorContent, setEditorContent] = useState<string | null>(null)
+  const [devServerStatus, setDevServerStatus] = useState<DevServerStatus>({ state: 'starting' })
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
     window.api.watchProject(project.path)
+    window.api.startDevServer(project.path)
 
-    const unsubscribe = window.api.onProjectTreeChanged(setTree)
+    const unsubTree = window.api.onProjectTreeChanged(setTree)
+    const unsubStatus = window.api.onDevServerStatusChanged(setDevServerStatus)
 
     return () => {
-      unsubscribe()
+      unsubTree()
+      unsubStatus()
       window.api.unwatchProject()
+      window.api.stopDevServer()
     }
   }, [project.path])
 
@@ -45,6 +52,8 @@ export function ProjectScreen({
     [selectedItem]
   )
 
+  const devServerUrl = devServerStatus.state === 'running' ? devServerStatus.url : undefined
+
   return (
     <div className="flex h-screen flex-col bg-background">
       <header className="flex items-center gap-3 border-b px-4 py-2">
@@ -61,28 +70,46 @@ export function ProjectScreen({
           <FolderOpen className="h-4 w-4" />
           {project.path}
         </div>
+        <div className="ml-auto">
+          <DevServerIndicator status={devServerStatus} />
+        </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar tree={tree} selectedPath={selectedItem?.fullPath ?? null} onSelect={handleSelect} />
 
-        <main className="flex flex-1 items-center justify-center p-8">
+        <main className="flex flex-1 overflow-hidden">
           {selectedItem && editorContent !== null ? (
-            <div className="h-full w-full">
-              <RawEditor
-                content={editorContent}
-                filePath={selectedItem.fullPath}
-                onSave={handleSave}
-              />
-            </div>
+            <>
+              <div className="flex w-1/2 flex-col border-r">
+                <RawEditor
+                  content={editorContent}
+                  filePath={selectedItem.fullPath}
+                  onSave={handleSave}
+                />
+              </div>
+              <div className="flex w-1/2 flex-col">
+                {devServerUrl ? (
+                  <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
+                ) : (
+                  <div className="flex flex-1 items-center justify-center">
+                    <p className="text-sm text-muted-foreground">{t('devServer.waiting')}</p>
+                  </div>
+                )}
+              </div>
+            </>
           ) : selectedItem ? (
-            <div className="text-center">
-              <h2 className="mb-2 text-xl font-semibold text-foreground">{selectedItem.name}</h2>
-              <p className="text-sm text-muted-foreground">{selectedItem.relativePath}</p>
-              <p className="mt-4 text-sm text-muted-foreground">{t('sidebar.editing')}</p>
+            <div className="flex flex-1 items-center justify-center">
+              <div className="text-center">
+                <h2 className="mb-2 text-xl font-semibold text-foreground">{selectedItem.name}</h2>
+                <p className="text-sm text-muted-foreground">{selectedItem.relativePath}</p>
+                <p className="mt-4 text-sm text-muted-foreground">{t('sidebar.editing')}</p>
+              </div>
             </div>
           ) : (
-            <p className="text-muted-foreground">{t('projectScreen.selectItem')}</p>
+            <div className="flex flex-1 items-center justify-center">
+              <p className="text-muted-foreground">{t('projectScreen.selectItem')}</p>
+            </div>
           )}
         </main>
       </div>

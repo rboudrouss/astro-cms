@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -24,7 +24,12 @@ export const IpcChannels = {
   GET_THEME_MANIFEST: 'theme:get-manifest',
   THEME_MANIFEST_UPDATED: 'theme:manifest-updated',
   READ_PAGE_CONTENT: 'page:read-content',
-  WRITE_PAGE_CONTENT: 'page:write-content'
+  WRITE_PAGE_CONTENT: 'page:write-content',
+  DEV_SERVER_START: 'dev-server:start',
+  DEV_SERVER_STOP: 'dev-server:stop',
+  DEV_SERVER_RESTART: 'dev-server:restart',
+  DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
+  DEV_SERVER_OUTPUT: 'dev-server:output'
 } as const
 
 export type RecentProject = {
@@ -63,4 +68,7 @@ export type IpcHandlerMap = {
   }
   [IpcChannels.READ_PAGE_CONTENT]: { args: [filePath: string]; return: string }
   [IpcChannels.WRITE_PAGE_CONTENT]: { args: [filePath: string, content: string]; return: void }
+  [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
+  [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
+  [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
 }

@@ -22,7 +22,12 @@ Object.defineProperty(window, 'api', {
     getThemeManifest: vi.fn().mockResolvedValue(null),
     onThemeManifestUpdated: vi.fn().mockReturnValue(vi.fn()),
     readPageContent: vi.fn().mockResolvedValue(''),
-    writePageContent: vi.fn().mockResolvedValue(undefined)
+    writePageContent: vi.fn().mockResolvedValue(undefined),
+    startDevServer: vi.fn().mockResolvedValue(undefined),
+    stopDevServer: vi.fn().mockResolvedValue(undefined),
+    restartDevServer: vi.fn().mockResolvedValue(undefined),
+    onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
+    onDevServerOutput: vi.fn().mockReturnValue(vi.fn())
   },
   writable: true,
   configurable: true
