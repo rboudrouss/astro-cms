@@ -58,6 +58,16 @@
     "noBlockSelected": "Select a block to edit its properties",
     "noSchema": "No editable properties for this block"
   },
+  "seo": {
+    "title": "SEO",
+    "metaTitle": "Meta Title",
+    "metaDescription": "Meta Description",
+    "ogImage": "OG Image",
+    "ogImageAlt": "Social card preview",
+    "noImage": "No image",
+    "untitled": "Untitled",
+    "preview": "Social Card Preview"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

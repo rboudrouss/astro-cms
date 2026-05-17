@@ -13,6 +13,7 @@ import { needsInstall, detectPackageManager, installDependencies } from './depen
 import { ThemeHotReloader } from './theme-hot-reloader'
 import { readPageContent, writePageContent } from './page-file'
 import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
+import { extractFrontmatter, updateFrontmatter } from './frontmatter-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
@@ -166,6 +167,21 @@ function registerIpcHandlers(): void {
     async (_event, filePath: string, blockName: string) => {
       const source = await readPageContent(filePath)
       return extractBlockProps(source, blockName)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.GET_PAGE_FRONTMATTER, async (_event, filePath: string) => {
+    const source = await readPageContent(filePath)
+    return extractFrontmatter(source)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPDATE_PAGE_FRONTMATTER,
+    async (_event, filePath: string, fields: Record<string, unknown>) => {
+      const source = await readPageContent(filePath)
+      const updated = await updateFrontmatter(source, fields)
+      await writePageContent(filePath, updated)
+      return updated
     }
   )
 

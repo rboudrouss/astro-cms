@@ -76,6 +76,13 @@ const api = {
     ipcRenderer.invoke(IpcChannels.UPDATE_BLOCK_PROPS, filePath, blockName, props),
   getBlockProps: (filePath: string, blockName: string): Promise<Record<string, unknown> | null> =>
     ipcRenderer.invoke(IpcChannels.GET_BLOCK_PROPS, filePath, blockName),
+  getPageFrontmatter: (filePath: string): Promise<Record<string, unknown>> =>
+    ipcRenderer.invoke(IpcChannels.GET_PAGE_FRONTMATTER, filePath),
+  updatePageFrontmatter: (
+    filePath: string,
+    fields: Record<string, unknown>
+  ): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_PAGE_FRONTMATTER, filePath, fields),
   startDevServer: (projectPath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
   stopDevServer: (): Promise<void> =>

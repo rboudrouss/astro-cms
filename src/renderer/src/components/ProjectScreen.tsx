@@ -8,10 +8,15 @@ import { DevServerIndicator } from '@/components/DevServerIndicator'
 import { PreviewPane } from '@/components/PreviewPane'
 import { BlockInfoBar } from '@/components/BlockInfoBar'
 import { PropEditorPanel } from '@/components/PropEditorPanel'
+import { SeoPanel } from '@/components/SeoPanel'
 import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
 } from '../../../shared/types'
+import {
+  detectSeoFields, extractSeoValues, hasSeoFields
+} from '../../../shared/seo-fields'
+import type { SeoFieldMapping, SeoValues } from '../../../shared/seo-fields'
 
 const DEBOUNCE_MS = 500
 
@@ -30,7 +35,10 @@ export function ProjectScreen({
   const [selectedBlock, setSelectedBlock] = useState<BlockSelection | null>(null)
   const [themeManifest, setThemeManifest] = useState<ThemeManifest | null>(null)
   const [blockProps, setBlockProps] = useState<Record<string, unknown> | null>(null)
+  const [seoMapping, setSeoMapping] = useState<SeoFieldMapping>({})
+  const [seoValues, setSeoValues] = useState<SeoValues>({})
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const seoDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
@@ -84,7 +92,15 @@ export function ProjectScreen({
     setBlockProps(null)
     const content = await window.api.readPageContent(item.fullPath)
     setEditorContent(content)
-  }, [])
+
+    const frontmatter = await window.api.getPageFrontmatter(item.fullPath)
+    const layout = themeManifest?.layouts.find((l) =>
+      typeof frontmatter.layout === 'string' && frontmatter.layout.includes(l.name)
+    )
+    const mapping = detectSeoFields(frontmatter, layout?.cmsHints)
+    setSeoMapping(mapping)
+    setSeoValues(extractSeoValues(frontmatter, mapping))
+  }, [themeManifest])
 
   const handleSave = useCallback(
     async (content: string) => {
@@ -112,9 +128,29 @@ export function ProjectScreen({
     [selectedItem, selectedBlock]
   )
 
+  const handleSeoChange = useCallback(
+    (values: SeoValues) => {
+      setSeoValues(values)
+      if (!selectedItem) return
+      if (seoDebounceRef.current) clearTimeout(seoDebounceRef.current)
+      seoDebounceRef.current = setTimeout(async () => {
+        const fields: Record<string, unknown> = {}
+        for (const [role, fieldName] of Object.entries(seoMapping)) {
+          if (fieldName && values[role as keyof SeoValues] !== undefined) {
+            fields[fieldName] = values[role as keyof SeoValues]
+          }
+        }
+        const updated = await window.api.updatePageFrontmatter(selectedItem.fullPath, fields)
+        setEditorContent(updated)
+      }, DEBOUNCE_MS)
+    },
+    [selectedItem, seoMapping]
+  )
+
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (seoDebounceRef.current) clearTimeout(seoDebounceRef.current)
     }
   }, [])
 
@@ -166,7 +202,7 @@ export function ProjectScreen({
                   </div>
                 )}
               </div>
-              {selectedBlockManifest && blockProps && (
+              {selectedBlockManifest && blockProps ? (
                 <PropEditorPanel
                   blockName={selectedBlockManifest.name}
                   schema={selectedBlockManifest.props}
@@ -174,7 +210,13 @@ export function ProjectScreen({
                   values={blockProps}
                   onChange={handlePropChange}
                 />
-              )}
+              ) : hasSeoFields(seoMapping) ? (
+                <SeoPanel
+                  mapping={seoMapping}
+                  values={seoValues}
+                  onChange={handleSeoChange}
+                />
+              ) : null}
             </>
           ) : selectedItem ? (
             <div className="flex flex-1 items-center justify-center">

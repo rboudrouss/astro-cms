@@ -27,6 +27,8 @@ export const IpcChannels = {
   WRITE_PAGE_CONTENT: 'page:write-content',
   UPDATE_BLOCK_PROPS: 'page:update-block-props',
   GET_BLOCK_PROPS: 'page:get-block-props',
+  GET_PAGE_FRONTMATTER: 'page:get-frontmatter',
+  UPDATE_PAGE_FRONTMATTER: 'page:update-frontmatter',
   DEV_SERVER_START: 'dev-server:start',
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
@@ -77,6 +79,14 @@ export type IpcHandlerMap = {
   [IpcChannels.GET_BLOCK_PROPS]: {
     args: [filePath: string, blockName: string]
     return: Record<string, unknown> | null
+  }
+  [IpcChannels.GET_PAGE_FRONTMATTER]: {
+    args: [filePath: string]
+    return: Record<string, unknown>
+  }
+  [IpcChannels.UPDATE_PAGE_FRONTMATTER]: {
+    args: [filePath: string, fields: Record<string, unknown>]
+    return: string
   }
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
