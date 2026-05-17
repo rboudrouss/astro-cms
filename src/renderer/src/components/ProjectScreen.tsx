@@ -20,9 +20,7 @@ export function ProjectScreen({
     window.api.scanProject(project.path).then(setTree)
     window.api.watchProject(project.path)
 
-    const unsubscribe = window.api.onProjectTreeChanged((newTree) => {
-      setTree(newTree)
-    })
+    const unsubscribe = window.api.onProjectTreeChanged(setTree)
 
     return () => {
       unsubscribe()

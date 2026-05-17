@@ -35,16 +35,17 @@ export class ProjectWatcher {
     }
   }
 
-  private watchDir(dirPath: string): void {
-    stat(dirPath)
-      .then((s) => {
-        if (!s.isDirectory()) return
-        const w = watch(dirPath, { recursive: true }, () => {
-          this.scheduleChange()
-        })
-        this.watchers.push(w)
+  private async watchDir(dirPath: string): Promise<void> {
+    try {
+      const s = await stat(dirPath)
+      if (!s.isDirectory()) return
+      const w = watch(dirPath, { recursive: true }, () => {
+        this.scheduleChange()
       })
-      .catch(() => {})
+      this.watchers.push(w)
+    } catch {
+      // Directory may not exist yet
+    }
   }
 
   private scheduleChange(): void {

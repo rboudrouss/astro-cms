@@ -3,6 +3,28 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, FileText, FolderOpen } from 'lucide-react'
 import type { ProjectTree, SidebarItem, CollectionNode } from '../../../shared/types'
 
+function FileItem({
+  item,
+  isSelected,
+  onSelect
+}: {
+  item: SidebarItem
+  isSelected: boolean
+  onSelect: (item: SidebarItem) => void
+}) {
+  return (
+    <button
+      onClick={() => onSelect(item)}
+      className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-sm hover:bg-accent/50 ${
+        isSelected ? 'bg-accent text-accent-foreground' : ''
+      }`}
+    >
+      <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      <span className="truncate">{item.name}</span>
+    </button>
+  )
+}
+
 function CollectionItem({
   collection,
   selectedPath,
@@ -31,16 +53,12 @@ function CollectionItem({
       {expanded && (
         <div className="ml-4">
           {collection.entries.map((entry) => (
-            <button
+            <FileItem
               key={entry.fullPath}
-              onClick={() => onSelect(entry)}
-              className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-sm hover:bg-accent/50 ${
-                selectedPath === entry.fullPath ? 'bg-accent text-accent-foreground' : ''
-              }`}
-            >
-              <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-              <span className="truncate">{entry.name}</span>
-            </button>
+              item={entry}
+              isSelected={selectedPath === entry.fullPath}
+              onSelect={onSelect}
+            />
           ))}
         </div>
       )}
@@ -77,16 +95,12 @@ export function Sidebar({
             {t('sidebar.pages')}
           </h3>
           {tree.pages.map((page) => (
-            <button
+            <FileItem
               key={page.fullPath}
-              onClick={() => onSelect(page)}
-              className={`flex w-full items-center gap-1.5 rounded px-2 py-1 text-sm hover:bg-accent/50 ${
-                selectedPath === page.fullPath ? 'bg-accent text-accent-foreground' : ''
-              }`}
-            >
-              <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-              <span className="truncate">{page.name}</span>
-            </button>
+              item={page}
+              isSelected={selectedPath === page.fullPath}
+              onSelect={onSelect}
+            />
           ))}
         </div>
       )}

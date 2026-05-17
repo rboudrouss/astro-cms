@@ -13,47 +13,36 @@ async function dirExists(dirPath: string): Promise<boolean> {
   }
 }
 
-async function scanPages(pagesDir: string): Promise<PageNode[]> {
-  if (!(await dirExists(pagesDir))) return []
-
-  const entries = await readdir(pagesDir, { withFileTypes: true })
-  const pages: PageNode[] = []
-
-  for (const entry of entries) {
-    if (!entry.isFile()) continue
-    const parsed = parse(entry.name)
-    if (!CONTENT_EXTENSIONS.has(parsed.ext)) continue
-
-    pages.push({
-      type: 'page',
-      name: parsed.name,
-      relativePath: entry.name,
-      fullPath: join(pagesDir, entry.name)
-    })
-  }
-
-  return pages.sort((a, b) => a.name.localeCompare(b.name))
-}
-
-async function scanCollection(collectionDir: string, collectionName: string): Promise<CollectionNode> {
-  const entries: EntryNode[] = []
-  const dirEntries = await readdir(collectionDir, { withFileTypes: true })
+async function scanContentFiles<T extends PageNode | EntryNode>(
+  dir: string,
+  type: T['type']
+): Promise<T[]> {
+  const dirEntries = await readdir(dir, { withFileTypes: true })
+  const nodes: T[] = []
 
   for (const entry of dirEntries) {
     if (!entry.isFile()) continue
     const parsed = parse(entry.name)
     if (!CONTENT_EXTENSIONS.has(parsed.ext)) continue
 
-    entries.push({
-      type: 'entry',
+    nodes.push({
+      type,
       name: parsed.name,
       relativePath: entry.name,
-      fullPath: join(collectionDir, entry.name)
-    })
+      fullPath: join(dir, entry.name)
+    } as T)
   }
 
-  entries.sort((a, b) => a.name.localeCompare(b.name))
+  return nodes.sort((a, b) => a.name.localeCompare(b.name))
+}
 
+async function scanPages(pagesDir: string): Promise<PageNode[]> {
+  if (!(await dirExists(pagesDir))) return []
+  return scanContentFiles<PageNode>(pagesDir, 'page')
+}
+
+async function scanCollection(collectionDir: string, collectionName: string): Promise<CollectionNode> {
+  const entries = await scanContentFiles<EntryNode>(collectionDir, 'entry')
   return { type: 'collection', name: collectionName, entries }
 }
 
