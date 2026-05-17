@@ -9,7 +9,9 @@ Object.defineProperty(window, 'api', {
     getLocale: vi.fn().mockResolvedValue('fr'),
     validateProject: vi.fn().mockResolvedValue({ valid: true, projectPath: '', issues: [] }),
     onUpdateDownloaded: vi.fn().mockReturnValue(vi.fn()),
-    installAndRestart: vi.fn().mockResolvedValue(undefined)
+    installAndRestart: vi.fn().mockResolvedValue(undefined),
+    readPageContent: vi.fn().mockResolvedValue(''),
+    writePageContent: vi.fn().mockResolvedValue(undefined)
   },
   writable: true,
   configurable: true

@@ -11,7 +11,9 @@ export const IpcChannels = {
   UPDATE_AVAILABLE: 'update:available',
   UPDATE_DOWNLOADED: 'update:downloaded',
   UPDATE_ERROR: 'update:error',
-  UPDATE_INSTALL_AND_RESTART: 'update:install-and-restart'
+  UPDATE_INSTALL_AND_RESTART: 'update:install-and-restart',
+  READ_PAGE_CONTENT: 'page:read-content',
+  WRITE_PAGE_CONTENT: 'page:write-content'
 } as const
 
 export type RecentProject = {
@@ -37,4 +39,6 @@ export type IpcHandlerMap = {
   [IpcChannels.GET_LOCALE]: { args: []; return: string }
   [IpcChannels.VALIDATE_PROJECT]: { args: [path: string]; return: ValidationReport }
   [IpcChannels.UPDATE_INSTALL_AND_RESTART]: { args: []; return: void }
+  [IpcChannels.READ_PAGE_CONTENT]: { args: [filePath: string]; return: string }
+  [IpcChannels.WRITE_PAGE_CONTENT]: { args: [filePath: string, content: string]; return: void }
 }

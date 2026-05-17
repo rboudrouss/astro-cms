@@ -24,7 +24,11 @@ const api = {
     }
   },
   installAndRestart: (): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.UPDATE_INSTALL_AND_RESTART)
+    ipcRenderer.invoke(IpcChannels.UPDATE_INSTALL_AND_RESTART),
+  readPageContent: (filePath: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.READ_PAGE_CONTENT, filePath),
+  writePageContent: (filePath: string, content: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.WRITE_PAGE_CONTENT, filePath, content)
 }
 
 export type ElectronApi = typeof api

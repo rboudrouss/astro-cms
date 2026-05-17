@@ -1,0 +1,18 @@
+---
+title: Nested Components
+layout: ../layouts/Main.astro
+---
+
+# Nested Page
+
+<Section title="Outer Section">
+  <ImageText image="/photo1.png" text="First image" />
+
+  Some markdown between nested blocks.
+
+  <SectionB variant="dark">
+    <ColorLigne color="#333" />
+
+    <ImageText image="/photo2.png" text="Nested image" reversed />
+  </SectionB>
+</Section>

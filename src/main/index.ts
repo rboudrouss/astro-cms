@@ -7,6 +7,7 @@ import { validateProject as validateProjectOpen } from './project-validator'
 import { validateProject as validateProjectReport } from './modules/project-validator'
 import { RecentProjectsStore } from './recent-projects'
 import { setupAutoUpdater, installAndRestart } from './updater'
+import { readPageContent, writePageContent } from './page-file'
 
 let recentProjectsStore: RecentProjectsStore
 
@@ -80,6 +81,17 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IpcChannels.VALIDATE_PROJECT, async (_event, path: string) => {
     return validateProjectReport(path)
   })
+
+  ipcMain.handle(IpcChannels.READ_PAGE_CONTENT, async (_event, filePath: string) => {
+    return readPageContent(filePath)
+  })
+
+  ipcMain.handle(
+    IpcChannels.WRITE_PAGE_CONTENT,
+    async (_event, filePath: string, content: string) => {
+      await writePageContent(filePath, content)
+    }
+  )
 }
 
 app.whenReady().then(() => {

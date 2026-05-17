@@ -5,5 +5,9 @@
   "newProject": "Nouveau projet",
   "recentProjects": "Projets récents",
   "noRecentProjects": "Aucun projet récent",
-  "language": "Langue"
+  "language": "Langue",
+  "back": "Retour",
+  "activeTheme": "Thème actif",
+  "path": "Chemin",
+  "openPage": "Ouvrir une page"
 }

@@ -5,5 +5,9 @@
   "newProject": "New project",
   "recentProjects": "Recent projects",
   "noRecentProjects": "No recent projects",
-  "language": "Language"
+  "language": "Language",
+  "back": "Back",
+  "activeTheme": "Active theme",
+  "path": "Path",
+  "openPage": "Open a page"
 }
