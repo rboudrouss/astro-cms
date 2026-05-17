@@ -58,6 +58,11 @@
     "noBlockSelected": "Select a block to edit its properties",
     "noSchema": "No editable properties for this block"
   },
+  "layoutWarning": {
+    "message": "This page uses a layout outside the active theme. Editing is partial.",
+    "applyLayout": "Apply a Theme Layout",
+    "layoutApplied": "Layout applied"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

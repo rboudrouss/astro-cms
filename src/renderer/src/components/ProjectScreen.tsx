@@ -8,6 +8,8 @@ import { DevServerIndicator } from '@/components/DevServerIndicator'
 import { PreviewPane } from '@/components/PreviewPane'
 import { BlockInfoBar } from '@/components/BlockInfoBar'
 import { PropEditorPanel } from '@/components/PropEditorPanel'
+import { LayoutWarningBanner } from '@/components/LayoutWarningBanner'
+import { extractLayoutFromSource, isLayoutFromTheme } from '../../../shared/layout-utils'
 import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
@@ -30,6 +32,7 @@ export function ProjectScreen({
   const [selectedBlock, setSelectedBlock] = useState<BlockSelection | null>(null)
   const [themeManifest, setThemeManifest] = useState<ThemeManifest | null>(null)
   const [blockProps, setBlockProps] = useState<Record<string, unknown> | null>(null)
+  const [layoutOutsideTheme, setLayoutOutsideTheme] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -84,13 +87,30 @@ export function ProjectScreen({
     setBlockProps(null)
     const content = await window.api.readPageContent(item.fullPath)
     setEditorContent(content)
-  }, [])
+
+    const layoutRef = extractLayoutFromSource(content)
+    if (layoutRef && themeManifest && !isLayoutFromTheme(layoutRef, themeManifest.layouts)) {
+      setLayoutOutsideTheme(true)
+    } else {
+      setLayoutOutsideTheme(false)
+    }
+  }, [themeManifest])
 
   const handleSave = useCallback(
     async (content: string) => {
       if (selectedItem) {
         await window.api.writePageContent(selectedItem.fullPath, content)
       }
+    },
+    [selectedItem]
+  )
+
+  const handleApplyLayout = useCallback(
+    async (layoutName: string) => {
+      if (!selectedItem) return
+      const updated = await window.api.applyThemeLayout(selectedItem.fullPath, layoutName)
+      setEditorContent(updated)
+      setLayoutOutsideTheme(false)
     },
     [selectedItem]
   )
@@ -144,37 +164,46 @@ export function ProjectScreen({
       <div className="flex flex-1 overflow-hidden">
         <Sidebar tree={tree} selectedPath={selectedItem?.fullPath ?? null} onSelect={handleSelect} />
 
-        <main className="flex flex-1 overflow-hidden">
+        <main className="flex flex-1 flex-col overflow-hidden">
           {selectedItem && editorContent !== null ? (
             <>
-              <div className="flex w-1/2 flex-col border-r">
-                <RawEditor
-                  content={editorContent}
-                  filePath={selectedItem.fullPath}
-                  onSave={handleSave}
-                />
-              </div>
-              <div className="flex w-1/2 flex-col">
-                {devServerUrl ? (
-                  <>
-                    <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
-                    {selectedBlock && <BlockInfoBar selection={selectedBlock} />}
-                  </>
-                ) : (
-                  <div className="flex flex-1 items-center justify-center">
-                    <p className="text-sm text-muted-foreground">{t('devServer.waiting')}</p>
-                  </div>
-                )}
-              </div>
-              {selectedBlockManifest && blockProps && (
-                <PropEditorPanel
-                  blockName={selectedBlockManifest.name}
-                  schema={selectedBlockManifest.props}
-                  cmsHints={selectedBlockManifest.cmsHints}
-                  values={blockProps}
-                  onChange={handlePropChange}
+              {layoutOutsideTheme && themeManifest && (
+                <LayoutWarningBanner
+                  currentLayout={extractLayoutFromSource(editorContent) ?? ''}
+                  themeLayouts={themeManifest.layouts}
+                  onApplyLayout={handleApplyLayout}
                 />
               )}
+              <div className="flex flex-1 overflow-hidden">
+                <div className="flex w-1/2 flex-col border-r">
+                  <RawEditor
+                    content={editorContent}
+                    filePath={selectedItem.fullPath}
+                    onSave={handleSave}
+                  />
+                </div>
+                <div className="flex w-1/2 flex-col">
+                  {devServerUrl ? (
+                    <>
+                      <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
+                      {selectedBlock && <BlockInfoBar selection={selectedBlock} />}
+                    </>
+                  ) : (
+                    <div className="flex flex-1 items-center justify-center">
+                      <p className="text-sm text-muted-foreground">{t('devServer.waiting')}</p>
+                    </div>
+                  )}
+                </div>
+                {selectedBlockManifest && blockProps && (
+                  <PropEditorPanel
+                    blockName={selectedBlockManifest.name}
+                    schema={selectedBlockManifest.props}
+                    cmsHints={selectedBlockManifest.cmsHints}
+                    values={blockProps}
+                    onChange={handlePropChange}
+                  />
+                )}
+              </div>
             </>
           ) : selectedItem ? (
             <div className="flex flex-1 items-center justify-center">

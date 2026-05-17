@@ -16,6 +16,7 @@ import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
+import { computeLayoutRef, updatePageLayout } from './layout-checker'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -220,6 +221,20 @@ function registerIpcHandlers(): void {
       activeDevServer.restart()
     }
   })
+
+  ipcMain.handle(
+    IpcChannels.APPLY_THEME_LAYOUT,
+    async (_event, pageFilePath: string, layoutName: string) => {
+      const manifest = activeReloader ? await activeReloader.getManifest() : null
+      const layout = manifest?.layouts.find((l) => l.name === layoutName)
+      if (!layout) throw new Error(`Layout "${layoutName}" not found in theme`)
+      const newLayoutRef = computeLayoutRef(pageFilePath, layout.filePath)
+      const source = await readPageContent(pageFilePath)
+      const updated = await updatePageLayout(source, newLayoutRef)
+      await writePageContent(pageFilePath, updated)
+      return updated
+    }
+  )
 }
 
 app.whenReady().then(() => {

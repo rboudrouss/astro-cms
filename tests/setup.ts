@@ -29,7 +29,8 @@ Object.defineProperty(window, 'api', {
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),
     onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
-    onDevServerOutput: vi.fn().mockReturnValue(vi.fn())
+    onDevServerOutput: vi.fn().mockReturnValue(vi.fn()),
+    applyThemeLayout: vi.fn().mockResolvedValue('')
   },
   writable: true,
   configurable: true

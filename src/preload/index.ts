@@ -97,7 +97,9 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.DEV_SERVER_OUTPUT, handler)
     }
-  }
+  },
+  applyThemeLayout: (pageFilePath: string, layoutName: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.APPLY_THEME_LAYOUT, pageFilePath, layoutName)
 }
 
 export type ElectronApi = typeof api

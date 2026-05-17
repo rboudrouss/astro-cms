@@ -23,6 +23,7 @@ export class ThemeHotReloader {
   private watcher: FSWatcher | null = null
   private projectPath: string
   private themeDir: string | null = null
+  private currentManifest: ThemeManifest | null = null
   private onUpdate: (manifest: ThemeManifest) => void
 
   constructor(projectPath: string, onUpdate: (manifest: ThemeManifest) => void) {
@@ -35,6 +36,7 @@ export class ThemeHotReloader {
     if (!this.themeDir) return null
 
     const manifest = await parseThemeManifest(this.themeDir)
+    this.currentManifest = manifest
 
     this.watcher = watch(this.themeDir, {
       ignoreInitial: true,
@@ -53,10 +55,15 @@ export class ThemeHotReloader {
     return manifest
   }
 
+  async getManifest(): Promise<ThemeManifest | null> {
+    return this.currentManifest
+  }
+
   private async rebuild(): Promise<void> {
     if (!this.themeDir) return
     try {
       const manifest = await parseThemeManifest(this.themeDir)
+      this.currentManifest = manifest
       this.onUpdate(manifest)
     } catch {
       // Theme in invalid state during edit — ignore until next save

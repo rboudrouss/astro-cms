@@ -31,7 +31,8 @@ export const IpcChannels = {
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
   DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
-  DEV_SERVER_OUTPUT: 'dev-server:output'
+  DEV_SERVER_OUTPUT: 'dev-server:output',
+  APPLY_THEME_LAYOUT: 'page:apply-theme-layout'
 } as const
 
 export type RecentProject = {
@@ -81,4 +82,8 @@ export type IpcHandlerMap = {
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
+  [IpcChannels.APPLY_THEME_LAYOUT]: {
+    args: [pageFilePath: string, layoutName: string]
+    return: string
+  }
 }
