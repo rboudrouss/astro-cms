@@ -29,7 +29,19 @@ Object.defineProperty(window, 'api', {
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),
     onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
-    onDevServerOutput: vi.fn().mockReturnValue(vi.fn())
+    onDevServerOutput: vi.fn().mockReturnValue(vi.fn()),
+    initGitWorkflow: vi.fn().mockResolvedValue({
+      state: 'idle',
+      currentBranch: 'astro-cms-work',
+      lastCommitHash: null,
+      lastCommitTime: null,
+      divergence: null,
+      error: null
+    }),
+    gitAutoSave: vi.fn().mockResolvedValue(undefined),
+    gitSave: vi.fn().mockResolvedValue(undefined),
+    gitGetStatus: vi.fn().mockResolvedValue(null),
+    onGitStatusChanged: vi.fn().mockReturnValue(vi.fn())
   },
   writable: true,
   configurable: true

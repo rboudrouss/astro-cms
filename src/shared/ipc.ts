@@ -1,4 +1,5 @@
 import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
+import type { GitWorkflowStatus } from './git-types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -31,7 +32,12 @@ export const IpcChannels = {
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
   DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
-  DEV_SERVER_OUTPUT: 'dev-server:output'
+  DEV_SERVER_OUTPUT: 'dev-server:output',
+  GIT_INIT_WORKFLOW: 'git:init-workflow',
+  GIT_AUTO_SAVE: 'git:auto-save',
+  GIT_SAVE: 'git:save',
+  GIT_GET_STATUS: 'git:get-status',
+  GIT_STATUS_CHANGED: 'git:status-changed'
 } as const
 
 export type RecentProject = {
@@ -81,4 +87,8 @@ export type IpcHandlerMap = {
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
+  [IpcChannels.GIT_INIT_WORKFLOW]: { args: [projectPath: string]; return: GitWorkflowStatus }
+  [IpcChannels.GIT_AUTO_SAVE]: { args: []; return: void }
+  [IpcChannels.GIT_SAVE]: { args: []; return: void }
+  [IpcChannels.GIT_GET_STATUS]: { args: []; return: GitWorkflowStatus | null }
 }

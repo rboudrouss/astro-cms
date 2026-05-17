@@ -64,5 +64,15 @@
     "error": "Error",
     "stopped": "Stopped",
     "waiting": "Waiting for dev server…"
+  },
+  "git": {
+    "saving": "Saving…",
+    "idle": "Up to date",
+    "committing": "Auto-saving…",
+    "pushing": "Pushing…",
+    "error": "Sync error",
+    "divergenceWarning": "The remote branch has new changes. Pull before editing to avoid conflicts.",
+    "save": "Save",
+    "divergedBehind": "{{count}} commit(s) behind remote"
   }
 }

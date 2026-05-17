@@ -8,6 +8,7 @@ import {
 } from '../src/shared/ipc'
 import type { OpenProjectResult, DepsCheckResult, DepsInstallResult } from '../src/shared/types'
 import type { ValidationReport } from '../src/shared/validation'
+import type { GitWorkflowStatus } from '../src/shared/git-types'
 
 describe('IPC channel definitions', () => {
   it('defines all required channels', () => {
@@ -101,5 +102,29 @@ describe('IPC channel definitions', () => {
       args: []
       return: void
     }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.GIT_INIT_WORKFLOW]>().toMatchTypeOf<{
+      args: [projectPath: string]
+      return: GitWorkflowStatus
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.GIT_AUTO_SAVE]>().toMatchTypeOf<{
+      args: []
+      return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.GIT_SAVE]>().toMatchTypeOf<{
+      args: []
+      return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.GIT_GET_STATUS]>().toMatchTypeOf<{
+      args: []
+      return: GitWorkflowStatus | null
+    }>()
+  })
+
+  it('defines git workflow channels', () => {
+    expect(IpcChannels.GIT_INIT_WORKFLOW).toBe('git:init-workflow')
+    expect(IpcChannels.GIT_AUTO_SAVE).toBe('git:auto-save')
+    expect(IpcChannels.GIT_SAVE).toBe('git:save')
+    expect(IpcChannels.GIT_GET_STATUS).toBe('git:get-status')
+    expect(IpcChannels.GIT_STATUS_CHANGED).toBe('git:status-changed')
   })
 })
