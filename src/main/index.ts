@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { IpcChannels } from '../shared/ipc'
+import { validateProject } from './modules/project-validator'
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -47,6 +48,10 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async () => {
     return []
+  })
+
+  ipcMain.handle(IpcChannels.VALIDATE_PROJECT, async (_event, path: string) => {
+    return validateProject(path)
   })
 }
 

@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject } from '../shared/ipc'
+import type { ValidationReport } from '../shared/validation'
 
 const api = {
   openProject: (): Promise<string | null> =>
@@ -9,7 +10,9 @@ const api = {
   newProject: (): Promise<string | null> =>
     ipcRenderer.invoke(IpcChannels.NEW_PROJECT),
   getRecentProjects: (): Promise<RecentProject[]> =>
-    ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS)
+    ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS),
+  validateProject: (path: string): Promise<ValidationReport> =>
+    ipcRenderer.invoke(IpcChannels.VALIDATE_PROJECT, path)
 }
 
 export type ElectronApi = typeof api
