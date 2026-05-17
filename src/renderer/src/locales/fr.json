@@ -5,5 +5,12 @@
   "newProject": "Nouveau projet",
   "recentProjects": "Projets récents",
   "noRecentProjects": "Aucun projet récent",
-  "language": "Langue"
+  "language": "Langue",
+  "blocks": "Blocs",
+  "layouts": "Layouts",
+  "noBlocks": "Aucun bloc disponible",
+  "noLayouts": "Aucun layout disponible",
+  "leaf": "Feuille",
+  "compositional": "Compositionnel",
+  "themeLoadError": "Impossible de charger le thème"
 }

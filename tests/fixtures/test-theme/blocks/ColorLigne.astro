@@ -1,0 +1,10 @@
+---
+interface Props {
+  color: string;
+  height?: number;
+}
+
+const { color, height = 2 } = Astro.props;
+---
+
+<hr style={`border-color: ${color}; border-width: ${height}px`} />

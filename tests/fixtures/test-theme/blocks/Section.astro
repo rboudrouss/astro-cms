@@ -1,0 +1,20 @@
+---
+interface Props {
+  /** Titre de la section */
+  title: string;
+  /** Couleur de fond */
+  bgColor?: string;
+}
+
+export const cmsHints = {
+  title: { format: "text" },
+  bgColor: { format: "color" },
+};
+
+const { title, bgColor = "#fff" } = Astro.props;
+---
+
+<section style={`background: ${bgColor}`}>
+  <h2>{title}</h2>
+  <slot />
+</section>

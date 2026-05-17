@@ -1,5 +1,6 @@
 import { ArrowLeft, FolderOpen, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeSidebar } from '@/components/ThemeSidebar'
 import type { ProjectInfo } from '../../../shared/types'
 
 export function ProjectScreen({
@@ -10,29 +11,32 @@ export function ProjectScreen({
   onBack: () => void
 }): React.JSX.Element {
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-background p-8">
-      <div className="w-full max-w-lg">
-        <Button variant="ghost" size="sm" onClick={onBack} className="mb-6">
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          Retour
-        </Button>
+    <div className="flex h-screen bg-background">
+      <ThemeSidebar projectPath={project.path} />
+      <div className="flex flex-1 flex-col items-center justify-center p-8">
+        <div className="w-full max-w-lg">
+          <Button variant="ghost" size="sm" onClick={onBack} className="mb-6">
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            Retour
+          </Button>
 
-        <h1 className="mb-6 text-2xl font-bold text-foreground">{project.name}</h1>
+          <h1 className="mb-6 text-2xl font-bold text-foreground">{project.name}</h1>
 
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <Palette className="mt-0.5 h-5 w-5 text-muted-foreground" />
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Thème actif</p>
-              <p className="text-foreground">{project.themeName}</p>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Palette className="mt-0.5 h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Thème actif</p>
+                <p className="text-foreground">{project.themeName}</p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-start gap-3">
-            <FolderOpen className="mt-0.5 h-5 w-5 text-muted-foreground" />
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Chemin</p>
-              <p className="text-foreground">{project.path}</p>
+            <div className="flex items-start gap-3">
+              <FolderOpen className="mt-0.5 h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Chemin</p>
+                <p className="text-foreground">{project.path}</p>
+              </div>
             </div>
           </div>
         </div>

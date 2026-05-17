@@ -5,5 +5,12 @@
   "newProject": "New project",
   "recentProjects": "Recent projects",
   "noRecentProjects": "No recent projects",
-  "language": "Language"
+  "language": "Language",
+  "blocks": "Blocks",
+  "layouts": "Layouts",
+  "noBlocks": "No blocks available",
+  "noLayouts": "No layouts available",
+  "leaf": "Leaf",
+  "compositional": "Compositional",
+  "themeLoadError": "Failed to load theme"
 }

@@ -1,0 +1,22 @@
+---
+interface Props {
+  /** Image principale */
+  image: string;
+  /** Texte affiché à côté de l'image */
+  text: string;
+  /** Texte à droite au lieu de gauche */
+  reversed?: boolean;
+}
+
+export const cmsHints = {
+  image: { format: "image" },
+  text: { format: "richtext" },
+};
+
+const { image, text, reversed = false } = Astro.props;
+---
+
+<div class={`image-text ${reversed ? 'reversed' : ''}`}>
+  <img src={image} alt="" />
+  <p>{text}</p>
+</div>
