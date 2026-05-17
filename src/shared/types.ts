@@ -130,6 +130,15 @@ export type SidebarItem =
   | PageNode
   | EntryNode
 
+export type PreviewMode = 'mobile' | 'tablet' | 'desktop' | 'full'
+
+export const PREVIEW_WIDTHS: Record<PreviewMode, number | null> = {
+  mobile: 375,
+  tablet: 768,
+  desktop: 1280,
+  full: null
+}
+
 export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'
 
 export type DevServerStatus = {

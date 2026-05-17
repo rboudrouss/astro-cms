@@ -6,7 +6,8 @@ import { Sidebar } from '@/components/Sidebar'
 import { RawEditor } from '@/components/RawEditor'
 import { DevServerIndicator } from '@/components/DevServerIndicator'
 import { PreviewPane } from '@/components/PreviewPane'
-import type { ProjectInfo, ProjectTree, SidebarItem, DevServerStatus } from '../../../shared/types'
+import { PreviewToolbar } from '@/components/PreviewToolbar'
+import type { ProjectInfo, ProjectTree, SidebarItem, DevServerStatus, PreviewMode } from '../../../shared/types'
 
 export function ProjectScreen({
   project,
@@ -20,6 +21,7 @@ export function ProjectScreen({
   const [selectedItem, setSelectedItem] = useState<SidebarItem | null>(null)
   const [editorContent, setEditorContent] = useState<string | null>(null)
   const [devServerStatus, setDevServerStatus] = useState<DevServerStatus>({ state: 'starting' })
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('full')
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
@@ -90,7 +92,16 @@ export function ProjectScreen({
               </div>
               <div className="flex w-1/2 flex-col">
                 {devServerUrl ? (
-                  <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
+                  <>
+                    <PreviewToolbar mode={previewMode} onChange={setPreviewMode} />
+                    <div className="flex-1 overflow-hidden">
+                      <PreviewPane
+                        url={devServerUrl}
+                        pagePath={selectedItem.relativePath}
+                        previewMode={previewMode}
+                      />
+                    </div>
+                  </>
                 ) : (
                   <div className="flex flex-1 items-center justify-center">
                     <p className="text-sm text-muted-foreground">{t('devServer.waiting')}</p>

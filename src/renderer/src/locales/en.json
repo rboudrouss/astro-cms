@@ -54,6 +54,12 @@
     "path": "Path",
     "selectItem": "Select a page or entry to edit"
   },
+  "preview": {
+    "mobile": "Mobile (375px)",
+    "tablet": "Tablet (768px)",
+    "desktop": "Desktop (1280px)",
+    "full": "Full width"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

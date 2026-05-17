@@ -54,6 +54,12 @@
     "path": "Chemin",
     "selectItem": "Sélectionnez une page ou une entrée pour l'éditer"
   },
+  "preview": {
+    "mobile": "Mobile (375px)",
+    "tablet": "Tablette (768px)",
+    "desktop": "Bureau (1280px)",
+    "full": "Pleine largeur"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",
