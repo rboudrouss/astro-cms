@@ -1,3 +1,10 @@
+import type { Root } from 'mdast'
+
+export type ContentAST = {
+  frontmatter: Record<string, unknown>
+  body: Root
+}
+
 export type ValidationError = {
   code: 'CONFIG_MISSING' | 'THEME_NOT_DECLARED' | 'THEME_NOT_FOUND' | 'THEME_NAME_MISSING'
   message: string

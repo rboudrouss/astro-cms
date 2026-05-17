@@ -37,5 +37,9 @@
   "noLayouts": "Aucun layout disponible",
   "leaf": "Feuille",
   "compositional": "Compositionnel",
-  "themeLoadError": "Impossible de charger le thème"
+  "themeLoadError": "Impossible de charger le thème",
+  "back": "Retour",
+  "activeTheme": "Thème actif",
+  "path": "Chemin",
+  "openPage": "Ouvrir une page"
 }

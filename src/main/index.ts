@@ -11,6 +11,7 @@ import { getTemplates } from './templates'
 import { generateProject } from './project-generator'
 import { needsInstall, detectPackageManager, installDependencies } from './dependency-installer'
 import { ThemeHotReloader } from './theme-hot-reloader'
+import { readPageContent, writePageContent } from './page-file'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -132,6 +133,17 @@ function registerIpcHandlers(): void {
       return null
     }
   })
+
+  ipcMain.handle(IpcChannels.READ_PAGE_CONTENT, async (_event, filePath: string) => {
+    return readPageContent(filePath)
+  })
+
+  ipcMain.handle(
+    IpcChannels.WRITE_PAGE_CONTENT,
+    async (_event, filePath: string, content: string) => {
+      await writePageContent(filePath, content)
+    }
+  )
 }
 
 app.whenReady().then(() => {

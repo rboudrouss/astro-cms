@@ -18,7 +18,9 @@ export const IpcChannels = {
   DEPS_INSTALL: 'deps:install',
   DEPS_INSTALL_OUTPUT: 'deps:install-output',
   GET_THEME_MANIFEST: 'theme:get-manifest',
-  THEME_MANIFEST_UPDATED: 'theme:manifest-updated'
+  THEME_MANIFEST_UPDATED: 'theme:manifest-updated',
+  READ_PAGE_CONTENT: 'page:read-content',
+  WRITE_PAGE_CONTENT: 'page:write-content'
 } as const
 
 export type RecentProject = {
@@ -52,4 +54,6 @@ export type IpcHandlerMap = {
     args: [projectPath: string]
     return: ThemeManifest | null
   }
+  [IpcChannels.READ_PAGE_CONTENT]: { args: [filePath: string]; return: string }
+  [IpcChannels.WRITE_PAGE_CONTENT]: { args: [filePath: string, content: string]; return: void }
 }

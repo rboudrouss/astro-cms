@@ -16,7 +16,9 @@ Object.defineProperty(window, 'api', {
     installDeps: vi.fn().mockResolvedValue({ success: true, packageManager: 'npm' }),
     onDepsInstallOutput: vi.fn().mockReturnValue(vi.fn()),
     getThemeManifest: vi.fn().mockResolvedValue(null),
-    onThemeManifestUpdated: vi.fn().mockReturnValue(vi.fn())
+    onThemeManifestUpdated: vi.fn().mockReturnValue(vi.fn()),
+    readPageContent: vi.fn().mockResolvedValue(''),
+    writePageContent: vi.fn().mockResolvedValue(undefined)
   },
   writable: true,
   configurable: true

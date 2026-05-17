@@ -50,7 +50,11 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.THEME_MANIFEST_UPDATED, handler)
     }
-  }
+  },
+  readPageContent: (filePath: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.READ_PAGE_CONTENT, filePath),
+  writePageContent: (filePath: string, content: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.WRITE_PAGE_CONTENT, filePath, content)
 }
 
 export type ElectronApi = typeof api

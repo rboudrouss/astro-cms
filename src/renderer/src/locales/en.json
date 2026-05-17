@@ -37,5 +37,9 @@
   "noLayouts": "No layouts available",
   "leaf": "Leaf",
   "compositional": "Compositional",
-  "themeLoadError": "Failed to load theme"
+  "themeLoadError": "Failed to load theme",
+  "back": "Back",
+  "activeTheme": "Active theme",
+  "path": "Path",
+  "openPage": "Open a page"
 }
