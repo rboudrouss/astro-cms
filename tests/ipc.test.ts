@@ -1,5 +1,6 @@
 import { describe, it, expect, expectTypeOf } from 'vitest'
 import { IpcChannels, type IpcHandlerMap, type RecentProject } from '../src/shared/ipc'
+import type { OpenProjectResult } from '../src/shared/types'
 
 describe('IPC channel definitions', () => {
   it('defines all required channels', () => {
@@ -23,7 +24,7 @@ describe('IPC channel definitions', () => {
   it('has handler map types defined for all channels', () => {
     expectTypeOf<IpcHandlerMap[typeof IpcChannels.OPEN_PROJECT]>().toMatchTypeOf<{
       args: []
-      return: string | null
+      return: OpenProjectResult
     }>()
     expectTypeOf<IpcHandlerMap[typeof IpcChannels.GET_RECENT_PROJECTS]>().toMatchTypeOf<{
       args: []

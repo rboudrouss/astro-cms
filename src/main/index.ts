@@ -2,6 +2,11 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { IpcChannels } from '../shared/ipc'
+import type { OpenProjectResult } from '../shared/types'
+import { validateProject } from './project-validator'
+import { RecentProjectsStore } from './recent-projects'
+
+let recentProjectsStore: RecentProjectsStore
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -29,12 +34,25 @@ function createWindow(): BrowserWindow {
 }
 
 function registerIpcHandlers(): void {
-  ipcMain.handle(IpcChannels.OPEN_PROJECT, async () => {
+  ipcMain.handle(IpcChannels.OPEN_PROJECT, async (): Promise<OpenProjectResult> => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory']
     })
-    if (result.canceled) return null
-    return result.filePaths[0] ?? null
+    if (result.canceled || !result.filePaths[0]) return { status: 'cancelled' }
+
+    const dirPath = result.filePaths[0]
+    const validation = await validateProject(dirPath)
+
+    if (!validation.valid) {
+      return { status: 'invalid', errors: validation.errors }
+    }
+
+    await recentProjectsStore.add({
+      path: validation.project.path,
+      name: validation.project.name
+    })
+
+    return { status: 'valid', project: validation.project }
   })
 
   ipcMain.handle(IpcChannels.CLONE_PROJECT, async () => {
@@ -46,11 +64,14 @@ function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IpcChannels.GET_RECENT_PROJECTS, async () => {
-    return []
+    return recentProjectsStore.load()
   })
 }
 
 app.whenReady().then(() => {
+  recentProjectsStore = new RecentProjectsStore(
+    join(app.getPath('userData'), 'recent-projects.json')
+  )
   registerIpcHandlers()
   createWindow()
 

@@ -1,5 +1,45 @@
+import { useCallback, useEffect, useState } from 'react'
 import { WelcomeScreen } from '@/components/WelcomeScreen'
+import { ProjectScreen } from '@/components/ProjectScreen'
+import { ErrorDialog } from '@/components/ErrorDialog'
+import type { ProjectInfo, ValidationError } from '../../shared/types'
+import type { RecentProject } from '../../shared/ipc'
+
+type AppState =
+  | { screen: 'welcome' }
+  | { screen: 'project'; project: ProjectInfo }
 
 export function App(): React.JSX.Element {
-  return <WelcomeScreen />
+  const [state, setState] = useState<AppState>({ screen: 'welcome' })
+  const [errors, setErrors] = useState<ValidationError[] | null>(null)
+  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([])
+
+  useEffect(() => {
+    window.api.getRecentProjects().then(setRecentProjects)
+  }, [])
+
+  const handleOpenProject = useCallback(async () => {
+    const result = await window.api.openProject()
+    if (result.status === 'valid') {
+      setState({ screen: 'project', project: result.project })
+      window.api.getRecentProjects().then(setRecentProjects)
+    } else if (result.status === 'invalid') {
+      setErrors(result.errors)
+    }
+  }, [])
+
+  return (
+    <>
+      {state.screen === 'welcome' && (
+        <WelcomeScreen recentProjects={recentProjects} onOpenProject={handleOpenProject} />
+      )}
+      {state.screen === 'project' && (
+        <ProjectScreen
+          project={state.project}
+          onBack={() => setState({ screen: 'welcome' })}
+        />
+      )}
+      {errors && <ErrorDialog errors={errors} onClose={() => setErrors(null)} />}
+    </>
+  )
 }

@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject } from '../shared/ipc'
+import type { OpenProjectResult } from '../shared/types'
 
 const api = {
-  openProject: (): Promise<string | null> =>
+  openProject: (): Promise<OpenProjectResult> =>
     ipcRenderer.invoke(IpcChannels.OPEN_PROJECT),
   cloneProject: (url: string): Promise<string | null> =>
     ipcRenderer.invoke(IpcChannels.CLONE_PROJECT, url),

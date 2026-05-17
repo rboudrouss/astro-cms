@@ -1,11 +1,14 @@
 import { FolderOpen, GitBranch, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import type { RecentProject } from '../../../shared/ipc'
 
-export function WelcomeScreen(): React.JSX.Element {
-  const handleOpenProject = async (): Promise<void> => {
-    await window.api.openProject()
-  }
-
+export function WelcomeScreen({
+  recentProjects,
+  onOpenProject
+}: {
+  recentProjects: RecentProject[]
+  onOpenProject: () => void
+}): React.JSX.Element {
   const handleCloneProject = async (): Promise<void> => {
     await window.api.cloneProject('')
   }
@@ -20,7 +23,7 @@ export function WelcomeScreen(): React.JSX.Element {
       <p className="mb-8 text-muted-foreground">Éditeur WYSIWYG pour sites Astro</p>
 
       <div className="mb-10 flex gap-4">
-        <Button variant="outline" size="lg" onClick={handleOpenProject}>
+        <Button variant="outline" size="lg" onClick={onOpenProject}>
           <FolderOpen />
           Ouvrir un projet local
         </Button>
@@ -36,7 +39,23 @@ export function WelcomeScreen(): React.JSX.Element {
 
       <div className="w-full max-w-md">
         <h2 className="mb-3 text-lg font-semibold text-foreground">Projets récents</h2>
-        <p className="text-sm text-muted-foreground">Aucun projet récent</p>
+        {recentProjects.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Aucun projet récent</p>
+        ) : (
+          <ul className="space-y-2">
+            {recentProjects.map((project) => (
+              <li
+                key={project.path}
+                className="flex items-center justify-between rounded-md border px-3 py-2"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">{project.name}</p>
+                  <p className="text-xs text-muted-foreground">{project.path}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )
