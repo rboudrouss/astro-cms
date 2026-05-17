@@ -130,6 +130,19 @@ export type SidebarItem =
   | PageNode
   | EntryNode
 
+export type BlockSelection = {
+  blockId: string
+  blockName: string
+  blockPath: string
+}
+
+export type BlockSelectionMessage = {
+  type: 'astro-cms:block-selected'
+  blockId: string
+  blockName: string
+  blockPath: string
+}
+
 export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'
 
 export type DevServerStatus = {

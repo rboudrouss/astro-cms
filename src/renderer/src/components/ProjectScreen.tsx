@@ -6,7 +6,8 @@ import { Sidebar } from '@/components/Sidebar'
 import { RawEditor } from '@/components/RawEditor'
 import { DevServerIndicator } from '@/components/DevServerIndicator'
 import { PreviewPane } from '@/components/PreviewPane'
-import type { ProjectInfo, ProjectTree, SidebarItem, DevServerStatus } from '../../../shared/types'
+import { BlockInfoBar } from '@/components/BlockInfoBar'
+import type { ProjectInfo, ProjectTree, SidebarItem, DevServerStatus, BlockSelection, BlockSelectionMessage } from '../../../shared/types'
 
 export function ProjectScreen({
   project,
@@ -20,6 +21,7 @@ export function ProjectScreen({
   const [selectedItem, setSelectedItem] = useState<SidebarItem | null>(null)
   const [editorContent, setEditorContent] = useState<string | null>(null)
   const [devServerStatus, setDevServerStatus] = useState<DevServerStatus>({ state: 'starting' })
+  const [selectedBlock, setSelectedBlock] = useState<BlockSelection | null>(null)
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
@@ -37,8 +39,23 @@ export function ProjectScreen({
     }
   }, [project.path])
 
+  useEffect(() => {
+    const handler = (event: MessageEvent): void => {
+      const data = event.data as BlockSelectionMessage | undefined
+      if (data?.type !== 'astro-cms:block-selected') return
+      setSelectedBlock({
+        blockId: data.blockId,
+        blockName: data.blockName,
+        blockPath: data.blockPath
+      })
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
+
   const handleSelect = useCallback(async (item: SidebarItem) => {
     setSelectedItem(item)
+    setSelectedBlock(null)
     const content = await window.api.readPageContent(item.fullPath)
     setEditorContent(content)
   }, [])
@@ -90,7 +107,10 @@ export function ProjectScreen({
               </div>
               <div className="flex w-1/2 flex-col">
                 {devServerUrl ? (
-                  <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
+                  <>
+                    <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
+                    {selectedBlock && <BlockInfoBar selection={selectedBlock} />}
+                  </>
                 ) : (
                   <div className="flex flex-1 items-center justify-center">
                     <p className="text-sm text-muted-foreground">{t('devServer.waiting')}</p>
