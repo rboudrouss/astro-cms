@@ -1,4 +1,5 @@
 import type { OpenProjectResult } from './types'
+import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
   OPEN_PROJECT: 'project:open',
@@ -6,6 +7,7 @@ export const IpcChannels = {
   NEW_PROJECT: 'project:new',
   GET_RECENT_PROJECTS: 'project:get-recent',
   GET_LOCALE: 'app:get-locale',
+  VALIDATE_PROJECT: 'project:validate',
   UPDATE_AVAILABLE: 'update:available',
   UPDATE_DOWNLOADED: 'update:downloaded',
   UPDATE_ERROR: 'update:error',
@@ -33,5 +35,6 @@ export type IpcHandlerMap = {
   [IpcChannels.NEW_PROJECT]: { args: []; return: string | null }
   [IpcChannels.GET_RECENT_PROJECTS]: { args: []; return: RecentProject[] }
   [IpcChannels.GET_LOCALE]: { args: []; return: string }
+  [IpcChannels.VALIDATE_PROJECT]: { args: [path: string]; return: ValidationReport }
   [IpcChannels.UPDATE_INSTALL_AND_RESTART]: { args: []; return: void }
 }

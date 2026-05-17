@@ -7,6 +7,7 @@ Object.defineProperty(window, 'api', {
     newProject: vi.fn().mockResolvedValue(null),
     getRecentProjects: vi.fn().mockResolvedValue([]),
     getLocale: vi.fn().mockResolvedValue('fr'),
+    validateProject: vi.fn().mockResolvedValue({ valid: true, projectPath: '', issues: [] }),
     onUpdateDownloaded: vi.fn().mockReturnValue(vi.fn()),
     installAndRestart: vi.fn().mockResolvedValue(undefined)
   },

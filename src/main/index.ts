@@ -3,7 +3,8 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { IpcChannels } from '../shared/ipc'
 import type { OpenProjectResult } from '../shared/types'
-import { validateProject } from './project-validator'
+import { validateProject as validateProjectOpen } from './project-validator'
+import { validateProject as validateProjectReport } from './modules/project-validator'
 import { RecentProjectsStore } from './recent-projects'
 import { setupAutoUpdater, installAndRestart } from './updater'
 
@@ -42,7 +43,7 @@ function registerIpcHandlers(): void {
     if (result.canceled || !result.filePaths[0]) return { status: 'cancelled' }
 
     const dirPath = result.filePaths[0]
-    const validation = await validateProject(dirPath)
+    const validation = await validateProjectOpen(dirPath)
 
     if (!validation.valid) {
       return { status: 'invalid', errors: validation.errors }
@@ -74,6 +75,10 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.UPDATE_INSTALL_AND_RESTART, () => {
     installAndRestart()
+  })
+
+  ipcMain.handle(IpcChannels.VALIDATE_PROJECT, async (_event, path: string) => {
+    return validateProjectReport(path)
   })
 }
 

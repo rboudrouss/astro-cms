@@ -7,6 +7,7 @@ import {
   type UpdateError
 } from '../src/shared/ipc'
 import type { OpenProjectResult } from '../src/shared/types'
+import type { ValidationReport } from '../src/shared/validation'
 
 describe('IPC channel definitions', () => {
   it('defines all required channels', () => {
@@ -14,6 +15,7 @@ describe('IPC channel definitions', () => {
     expect(IpcChannels.CLONE_PROJECT).toBe('project:clone')
     expect(IpcChannels.NEW_PROJECT).toBe('project:new')
     expect(IpcChannels.GET_RECENT_PROJECTS).toBe('project:get-recent')
+    expect(IpcChannels.VALIDATE_PROJECT).toBe('project:validate')
   })
 
   it('defines update channels', () => {
@@ -60,6 +62,10 @@ describe('IPC channel definitions', () => {
     expectTypeOf<IpcHandlerMap[typeof IpcChannels.UPDATE_INSTALL_AND_RESTART]>().toMatchTypeOf<{
       args: []
       return: void
+    }>()
+    expectTypeOf<IpcHandlerMap[typeof IpcChannels.VALIDATE_PROJECT]>().toMatchTypeOf<{
+      args: [path: string]
+      return: ValidationReport
     }>()
   })
 })

@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
 import type { OpenProjectResult } from '../shared/types'
+import type { ValidationReport } from '../shared/validation'
 
 const api = {
   openProject: (): Promise<OpenProjectResult> =>
@@ -13,6 +14,8 @@ const api = {
     ipcRenderer.invoke(IpcChannels.GET_RECENT_PROJECTS),
   getLocale: (): Promise<string> =>
     ipcRenderer.invoke(IpcChannels.GET_LOCALE),
+  validateProject: (path: string): Promise<ValidationReport> =>
+    ipcRenderer.invoke(IpcChannels.VALIDATE_PROJECT, path),
   onUpdateDownloaded: (callback: (info: UpdateInfo) => void): (() => void) => {
     const handler = (_event: Electron.IpcRendererEvent, info: UpdateInfo): void => callback(info)
     ipcRenderer.on(IpcChannels.UPDATE_DOWNLOADED, handler)
