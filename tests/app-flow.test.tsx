@@ -159,7 +159,7 @@ describe('App flow', () => {
       project: { name: 'mon-site', path: '/home/user/mon-site', themeName: 'psu-theme' }
     }
     vi.mocked(window.api.openProject).mockResolvedValue(validResult)
-    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue(false)
+    vi.mocked(window.api.checkDepsNeeded).mockResolvedValue({ needed: false })
 
     renderApp()
     await userEvent.click(screen.getByText('Ouvrir un projet local'))

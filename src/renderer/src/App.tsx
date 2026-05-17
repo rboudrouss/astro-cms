@@ -44,14 +44,13 @@ export function App(): React.JSX.Element {
   const handleOpenProject = useCallback(async () => {
     const result = await window.api.openProject()
     if (result.status === 'valid') {
+      window.api.getRecentProjects().then(setRecentProjects)
       const check = await window.api.checkDepsNeeded(result.project.path)
       if (check.needed) {
         setState({ screen: 'installing', project: result.project, packageManager: check.packageManager })
-        window.api.getRecentProjects().then(setRecentProjects)
         runInstall(result.project)
       } else {
         setState({ screen: 'project', project: result.project })
-        window.api.getRecentProjects().then(setRecentProjects)
       }
     } else if (result.status === 'invalid') {
       setErrors(result.errors)

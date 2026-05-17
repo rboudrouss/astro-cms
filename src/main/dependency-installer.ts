@@ -5,8 +5,6 @@ import type { WebContents } from 'electron'
 import { IpcChannels } from '../shared/ipc'
 import type { PackageManager, DepsInstallResult } from '../shared/types'
 
-export type { PackageManager, DepsInstallResult }
-
 type SpawnFn = (cmd: string, args: string[], opts: object) => ChildProcess
 
 export async function needsInstall(projectPath: string): Promise<boolean> {
@@ -28,9 +26,7 @@ export async function detectPackageManager(projectPath: string): Promise<Package
     try {
       await access(join(projectPath, file))
       return pm
-    } catch {
-      // continue
-    }
+    } catch {}
   }
   return 'npm'
 }
@@ -44,8 +40,7 @@ export function installDependencies(
   return new Promise((resolve) => {
     const child = spawnFn(packageManager, ['install'], {
       cwd: projectPath,
-      shell: true,
-      env: { ...process.env }
+      shell: true
     })
 
     const sendOutput = (line: string): void => {
