@@ -11,6 +11,7 @@ import { PropEditorPanel } from '@/components/PropEditorPanel'
 import { EntryEditorForm } from '@/components/EntryEditorForm'
 import { NewEntryDialog } from '@/components/NewEntryDialog'
 import { DeleteEntryDialog } from '@/components/DeleteEntryDialog'
+import { parseFrontmatter, validateEntryFields } from '@/lib/entry-validation'
 import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest,
@@ -18,29 +19,6 @@ import type {
 } from '../../../shared/types'
 
 const DEBOUNCE_MS = 500
-const FM_RE = /^---\n([\s\S]*?)\n---/
-
-function parseFrontmatterFromContent(content: string): Record<string, unknown> {
-  const match = content.match(FM_RE)
-  if (!match) return {}
-  try {
-    const lines = match[1].split('\n')
-    const result: Record<string, unknown> = {}
-    for (const line of lines) {
-      const colonIdx = line.indexOf(':')
-      if (colonIdx === -1) continue
-      const key = line.slice(0, colonIdx).trim()
-      let value: unknown = line.slice(colonIdx + 1).trim()
-      if (value === 'true') value = true
-      else if (value === 'false') value = false
-      else if (value !== '' && !isNaN(Number(value))) value = Number(value)
-      result[key] = value
-    }
-    return result
-  } catch {
-    return {}
-  }
-}
 
 function findCollectionName(tree: ProjectTree, item: SidebarItem): string | null {
   for (const collection of tree.collections) {
@@ -137,7 +115,7 @@ export function ProjectScreen({
         const schema = await window.api.getCollectionSchema(project.path, collectionName)
         setCollectionSchema(schema)
         if (schema && content) {
-          const fm = parseFrontmatterFromContent(content)
+          const fm = parseFrontmatter(content)
           setEntryFrontmatter(fm)
         }
       }
@@ -213,15 +191,7 @@ export function ProjectScreen({
     setEntryFrontmatter(values)
 
     if (collectionSchema) {
-      const errors: EntryValidationError[] = []
-      for (const field of collectionSchema.fields) {
-        if (!field.required) continue
-        const val = values[field.name]
-        if (val === undefined || val === null || val === '') {
-          errors.push({ field: field.name, message: `${field.name} is required` })
-        }
-      }
-      setEntryValidationErrors(errors)
+      setEntryValidationErrors(validateEntryFields(collectionSchema, values))
     }
 
     if (!selectedItem) return

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { EntryEditorForm } from '@/components/EntryEditorForm'
+import { validateEntryFields } from '@/lib/entry-validation'
 import type { CollectionSchema, EntryValidationError } from '../../../shared/types'
 
 type Props = {
@@ -22,22 +23,6 @@ function buildDefaults(schema: CollectionSchema | null): Record<string, unknown>
     }
   }
   return defaults
-}
-
-function validateFields(
-  schema: CollectionSchema | null,
-  values: Record<string, unknown>
-): EntryValidationError[] {
-  if (!schema) return []
-  const errors: EntryValidationError[] = []
-  for (const field of schema.fields) {
-    if (!field.required) continue
-    const val = values[field.name]
-    if (val === undefined || val === null || val === '') {
-      errors.push({ field: field.name, message: `${field.name} is required` })
-    }
-  }
-  return errors
 }
 
 export function NewEntryDialog({
@@ -73,7 +58,7 @@ export function NewEntryDialog({
       return
     }
 
-    const fieldErrors = validateFields(schema, values)
+    const fieldErrors = schema ? validateEntryFields(schema, values) : []
     if (fieldErrors.length > 0) {
       setValidationErrors(fieldErrors)
       return
@@ -110,7 +95,7 @@ export function NewEntryDialog({
             values={values}
             onChange={(v) => {
               setValues(v)
-              setValidationErrors(validateFields(schema, v))
+              setValidationErrors(validateEntryFields(schema, v))
             }}
             validationErrors={validationErrors}
           />
