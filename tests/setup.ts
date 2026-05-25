@@ -1,6 +1,13 @@
 import '@testing-library/jest-dom/vitest'
 import { DEFAULT_GIT_STATUS } from '../src/shared/git-types'
 
+// ProseMirror / TipTap needs DOM measurement APIs that jsdom doesn't implement
+Range.prototype.getClientRects = () => ({ length: 0, item: () => null, [Symbol.iterator]: function* () {} }) as DOMRectList
+Range.prototype.getBoundingClientRect = () => ({ top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) })
+if (!document.elementFromPoint) {
+  document.elementFromPoint = () => null
+}
+
 Object.defineProperty(window, 'api', {
   value: {
     openProject: vi.fn().mockResolvedValue({ status: 'cancelled' }),
@@ -30,6 +37,9 @@ Object.defineProperty(window, 'api', {
     insertBlock: vi.fn().mockResolvedValue(''),
     deleteBlock: vi.fn().mockResolvedValue(''),
     reorderBlocks: vi.fn().mockResolvedValue(''),
+    getTextNodes: vi.fn().mockResolvedValue([]),
+    updateTextContent: vi.fn().mockResolvedValue(''),
+    saveInlineEdit: vi.fn().mockResolvedValue(''),
     startDevServer: vi.fn().mockResolvedValue(undefined),
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),

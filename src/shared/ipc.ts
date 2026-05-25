@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance, TextNodeInfo } from './types'
 import type { GitWorkflowStatus } from './git-types'
 import type { ValidationReport } from './validation'
 
@@ -28,6 +28,9 @@ export const IpcChannels = {
   WRITE_PAGE_CONTENT: 'page:write-content',
   UPDATE_BLOCK_PROPS: 'page:update-block-props',
   GET_BLOCK_PROPS: 'page:get-block-props',
+  GET_TEXT_NODES: 'page:get-text-nodes',
+  UPDATE_TEXT_CONTENT: 'page:update-text-content',
+  SAVE_INLINE_EDIT: 'page:save-inline-edit',
   DEV_SERVER_START: 'dev-server:start',
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
@@ -91,6 +94,18 @@ export type IpcHandlerMap = {
   [IpcChannels.GET_BLOCK_PROPS]: {
     args: [filePath: string, blockName: string]
     return: Record<string, unknown> | null
+  }
+  [IpcChannels.GET_TEXT_NODES]: {
+    args: [filePath: string]
+    return: TextNodeInfo[]
+  }
+  [IpcChannels.UPDATE_TEXT_CONTENT]: {
+    args: [filePath: string, nodeIndex: number, newMarkdown: string]
+    return: string
+  }
+  [IpcChannels.SAVE_INLINE_EDIT]: {
+    args: [filePath: string, nodeIndex: number, html: string]
+    return: string
   }
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }

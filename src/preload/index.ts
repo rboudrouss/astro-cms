@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo } from '../shared/types'
 import type { GitWorkflowStatus } from '../shared/git-types'
 import type { ValidationReport } from '../shared/validation'
 
@@ -90,6 +90,12 @@ const api = {
     ipcRenderer.invoke(IpcChannels.DELETE_BLOCK, filePath, blockIndex),
   reorderBlocks: (filePath: string, fromIndex: number, toIndex: number): Promise<string> =>
     ipcRenderer.invoke(IpcChannels.REORDER_BLOCKS, filePath, fromIndex, toIndex),
+  getTextNodes: (filePath: string): Promise<TextNodeInfo[]> =>
+    ipcRenderer.invoke(IpcChannels.GET_TEXT_NODES, filePath),
+  updateTextContent: (filePath: string, nodeIndex: number, newMarkdown: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_TEXT_CONTENT, filePath, nodeIndex, newMarkdown),
+  saveInlineEdit: (filePath: string, nodeIndex: number, html: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.SAVE_INLINE_EDIT, filePath, nodeIndex, html),
   startDevServer: (projectPath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
   stopDevServer: (): Promise<void> =>

@@ -147,6 +147,23 @@ export type BlockInstance = {
   props: Record<string, unknown>
 }
 
+export type TextSelectionMessage = {
+  type: 'astro-cms:text-selected'
+  tagName: string
+  textContent: string
+  innerHTML: string
+  rect: { top: number; left: number; width: number; height: number }
+  computedStyles: Record<string, string>
+}
+
+export type TextNodeInfo = {
+  index: number
+  type: 'heading' | 'paragraph' | 'blockquote'
+  depth?: number
+  content: string
+  textContent: string
+}
+
 export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'
 
 export type DevServerStatus = {
