@@ -51,34 +51,31 @@ export async function extractTextNodes(source: string): Promise<TextNodeInfo[]> 
 
   for (const node of body.children) {
     if (node.type === 'heading') {
-      const heading = node as Heading
       nodes.push({
         index: index++,
         type: 'heading',
-        depth: heading.depth,
-        content: serializeNode(heading),
-        textContent: extractPlainText(heading.children),
+        depth: node.depth,
+        content: serializeNode(node),
+        textContent: extractPlainText(node.children),
         position: node.position! as TextNodeInfo['position']
       })
     } else if (node.type === 'paragraph') {
-      const para = node as Paragraph
       nodes.push({
         index: index++,
         type: 'paragraph',
-        content: serializeNode(para),
-        textContent: extractPlainText(para.children),
+        content: serializeNode(node),
+        textContent: extractPlainText(node.children),
         position: node.position! as TextNodeInfo['position']
       })
     } else if (node.type === 'blockquote') {
-      const bq = node as Blockquote
-      const innerText = bq.children
+      const innerText = node.children
         .filter((c): c is Paragraph => c.type === 'paragraph')
         .map((p) => extractPlainText(p.children))
         .join('\n')
       nodes.push({
         index: index++,
         type: 'blockquote',
-        content: serializeNode(bq),
+        content: serializeNode(node),
         textContent: innerText,
         position: node.position! as TextNodeInfo['position']
       })

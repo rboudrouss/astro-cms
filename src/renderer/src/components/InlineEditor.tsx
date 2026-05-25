@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import type { TextSelectionMessage } from '../../../shared/types'
@@ -16,8 +16,6 @@ export function InlineEditor({
   onSave,
   onCancel
 }: InlineEditorProps): React.JSX.Element {
-  const containerRef = useRef<HTMLDivElement>(null)
-
   const editor = useEditor({
     extensions: [StarterKit],
     content: selection.innerHTML,
@@ -79,7 +77,6 @@ export function InlineEditor({
 
   return (
     <div
-      ref={containerRef}
       data-testid="inline-editor"
       style={inlineStyles}
       onBlur={handleBlur}

@@ -17,7 +17,7 @@ import type {
 
 const DEBOUNCE_MS = 500
 
-const TAG_TO_TYPE: Record<string, string> = {
+const TAG_TO_TYPE: Record<string, TextNodeInfo['type']> = {
   h1: 'heading', h2: 'heading', h3: 'heading',
   h4: 'heading', h5: 'heading', h6: 'heading',
   p: 'paragraph', blockquote: 'blockquote'
