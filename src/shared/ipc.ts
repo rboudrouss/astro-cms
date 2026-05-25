@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -31,7 +31,11 @@ export const IpcChannels = {
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
   DEV_SERVER_STATUS_CHANGED: 'dev-server:status-changed',
-  DEV_SERVER_OUTPUT: 'dev-server:output'
+  DEV_SERVER_OUTPUT: 'dev-server:output',
+  GET_PAGE_BLOCKS: 'page:get-blocks',
+  INSERT_BLOCK: 'page:insert-block',
+  DELETE_BLOCK: 'page:delete-block',
+  REORDER_BLOCKS: 'page:reorder-blocks'
 } as const
 
 export type RecentProject = {
@@ -81,4 +85,20 @@ export type IpcHandlerMap = {
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }
   [IpcChannels.DEV_SERVER_STOP]: { args: []; return: void }
   [IpcChannels.DEV_SERVER_RESTART]: { args: []; return: void }
+  [IpcChannels.GET_PAGE_BLOCKS]: {
+    args: [filePath: string]
+    return: BlockInstance[]
+  }
+  [IpcChannels.INSERT_BLOCK]: {
+    args: [filePath: string, blockName: string, props: Record<string, unknown>, position: number]
+    return: string
+  }
+  [IpcChannels.DELETE_BLOCK]: {
+    args: [filePath: string, blockIndex: number]
+    return: string
+  }
+  [IpcChannels.REORDER_BLOCKS]: {
+    args: [filePath: string, fromIndex: number, toIndex: number]
+    return: string
+  }
 }
