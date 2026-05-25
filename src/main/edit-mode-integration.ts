@@ -41,9 +41,60 @@ export function generateEditModeScript(): string {
     }
   }, true);
 
+  var TEXT_TAGS = ['H1','H2','H3','H4','H5','H6','P','BLOCKQUOTE'];
+
+  function getTextElement(target) {
+    var el = target;
+    while (el && el !== document.body) {
+      if (TEXT_TAGS.indexOf(el.tagName) !== -1) return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  function getStyleSnapshot(el) {
+    var cs = window.getComputedStyle(el);
+    return {
+      fontSize: cs.fontSize,
+      fontFamily: cs.fontFamily,
+      fontWeight: cs.fontWeight,
+      fontStyle: cs.fontStyle,
+      color: cs.color,
+      lineHeight: cs.lineHeight,
+      textAlign: cs.textAlign,
+      letterSpacing: cs.letterSpacing,
+      textDecoration: cs.textDecoration,
+      padding: cs.padding,
+      margin: cs.margin
+    };
+  }
+
   document.addEventListener('click', function(e) {
-    const block = e.target.closest('[data-block-id]');
-    if (!block) return;
+    var block = e.target.closest('[data-block-id]');
+
+    if (block) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (selectedEl) {
+        selectedEl.classList.remove('astro-cms-selected');
+      }
+
+      block.classList.remove('astro-cms-hover');
+      block.classList.add('astro-cms-selected');
+      selectedEl = block;
+
+      parent.postMessage({
+        type: 'astro-cms:block-selected',
+        blockId: block.getAttribute('data-block-id'),
+        blockName: block.getAttribute('data-block-name'),
+        blockPath: block.getAttribute('data-block-path')
+      }, '*');
+      return;
+    }
+
+    var textEl = getTextElement(e.target);
+    if (!textEl) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -52,15 +103,17 @@ export function generateEditModeScript(): string {
       selectedEl.classList.remove('astro-cms-selected');
     }
 
-    block.classList.remove('astro-cms-hover');
-    block.classList.add('astro-cms-selected');
-    selectedEl = block;
+    textEl.classList.add('astro-cms-selected');
+    selectedEl = textEl;
 
+    var rect = textEl.getBoundingClientRect();
     parent.postMessage({
-      type: 'astro-cms:block-selected',
-      blockId: block.getAttribute('data-block-id'),
-      blockName: block.getAttribute('data-block-name'),
-      blockPath: block.getAttribute('data-block-path')
+      type: 'astro-cms:text-selected',
+      tagName: textEl.tagName.toLowerCase(),
+      textContent: textEl.textContent,
+      innerHTML: textEl.innerHTML,
+      rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
+      computedStyles: getStyleSnapshot(textEl)
     }, '*');
   }, true);
 })();

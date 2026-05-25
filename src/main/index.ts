@@ -13,6 +13,8 @@ import { needsInstall, detectPackageManager, installDependencies } from './depen
 import { ThemeHotReloader } from './theme-hot-reloader'
 import { readPageContent, writePageContent } from './page-file'
 import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
+import { extractTextNodes, updateTextContent } from './mdx-content-updater'
+import { htmlToMarkdown } from './tiptap-serializer'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
@@ -166,6 +168,32 @@ function registerIpcHandlers(): void {
     async (_event, filePath: string, blockName: string) => {
       const source = await readPageContent(filePath)
       return extractBlockProps(source, blockName)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.GET_TEXT_NODES, async (_event, filePath: string) => {
+    const source = await readPageContent(filePath)
+    return extractTextNodes(source)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPDATE_TEXT_CONTENT,
+    async (_event, filePath: string, nodeIndex: number, newMarkdown: string) => {
+      const source = await readPageContent(filePath)
+      const updated = await updateTextContent(source, nodeIndex, newMarkdown)
+      await writePageContent(filePath, updated)
+      return updated
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.SAVE_INLINE_EDIT,
+    async (_event, filePath: string, nodeIndex: number, html: string) => {
+      const newMarkdown = (await htmlToMarkdown(html)).trimEnd()
+      const source = await readPageContent(filePath)
+      const updated = await updateTextContent(source, nodeIndex, newMarkdown)
+      await writePageContent(filePath, updated)
+      return updated
     }
   )
 

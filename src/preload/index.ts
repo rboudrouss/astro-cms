@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, TextNodeInfo } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -76,6 +76,12 @@ const api = {
     ipcRenderer.invoke(IpcChannels.UPDATE_BLOCK_PROPS, filePath, blockName, props),
   getBlockProps: (filePath: string, blockName: string): Promise<Record<string, unknown> | null> =>
     ipcRenderer.invoke(IpcChannels.GET_BLOCK_PROPS, filePath, blockName),
+  getTextNodes: (filePath: string): Promise<TextNodeInfo[]> =>
+    ipcRenderer.invoke(IpcChannels.GET_TEXT_NODES, filePath),
+  updateTextContent: (filePath: string, nodeIndex: number, newMarkdown: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_TEXT_CONTENT, filePath, nodeIndex, newMarkdown),
+  saveInlineEdit: (filePath: string, nodeIndex: number, html: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.SAVE_INLINE_EDIT, filePath, nodeIndex, html),
   startDevServer: (projectPath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
   stopDevServer: (): Promise<void> =>
