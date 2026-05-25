@@ -14,7 +14,7 @@ import type {
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
 } from '../../../shared/types'
 import {
-  detectSeoFields, extractSeoValues, hasSeoFields
+  detectSeoFields, extractSeoValues, seoValuesToFields, hasSeoFields
 } from '../../../shared/seo-fields'
 import type { SeoFieldMapping, SeoValues } from '../../../shared/seo-fields'
 
@@ -134,13 +134,7 @@ export function ProjectScreen({
       if (!selectedItem) return
       if (seoDebounceRef.current) clearTimeout(seoDebounceRef.current)
       seoDebounceRef.current = setTimeout(async () => {
-        const fields: Record<string, unknown> = {}
-        for (const [role, fieldName] of Object.entries(seoMapping)) {
-          const value = values[role as keyof SeoValues]
-          if (fieldName && value !== undefined) {
-            fields[fieldName] = value
-          }
-        }
+        const fields = seoValuesToFields(values, seoMapping)
         const updated = await window.api.updatePageFrontmatter(selectedItem.fullPath, fields)
         setEditorContent(updated)
       }, DEBOUNCE_MS)

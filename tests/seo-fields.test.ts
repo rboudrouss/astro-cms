@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   detectSeoFields,
   extractSeoValues,
+  seoValuesToFields,
   validateSeoField,
   hasSeoFields,
   SEO_LIMITS
@@ -203,6 +204,30 @@ describe('validateSeoField', () => {
   it('returns no warnings for ogImage', () => {
     const warnings = validateSeoField('ogImage', '/img.png')
     expect(warnings).toEqual([])
+  })
+})
+
+describe('seoValuesToFields', () => {
+  it('converts role-keyed values back to field-name-keyed entries', () => {
+    const mapping = { title: 'myTitle', description: 'desc' } as const
+    const values = { title: 'Hello', description: 'World' }
+    expect(seoValuesToFields(values, mapping)).toEqual({ myTitle: 'Hello', desc: 'World' })
+  })
+
+  it('skips roles not present in values', () => {
+    const mapping = { title: 'title', description: 'description' } as const
+    const values = { title: 'Only title' }
+    expect(seoValuesToFields(values, mapping)).toEqual({ title: 'Only title' })
+  })
+
+  it('includes empty strings', () => {
+    const mapping = { title: 'title' } as const
+    const values = { title: '' }
+    expect(seoValuesToFields(values, mapping)).toEqual({ title: '' })
+  })
+
+  it('returns empty object for empty mapping', () => {
+    expect(seoValuesToFields({ title: 'Hello' }, {})).toEqual({})
   })
 })
 

@@ -108,6 +108,20 @@ export function validateSeoField(role: SeoRole, value: string): SeoWarning[] {
   return warnings
 }
 
+export function seoValuesToFields(
+  values: SeoValues,
+  mapping: SeoFieldMapping
+): Record<string, unknown> {
+  const fields: Record<string, unknown> = {}
+  for (const [role, fieldName] of Object.entries(mapping)) {
+    const value = values[role as SeoRole]
+    if (fieldName && value !== undefined) {
+      fields[fieldName] = value
+    }
+  }
+  return fields
+}
+
 export function hasSeoFields(mapping: SeoFieldMapping): boolean {
   return Object.keys(mapping).length > 0
 }
