@@ -14,8 +14,9 @@ function serializeOverrides(overrides: Record<string, unknown>): string {
   const entries = Object.entries(overrides)
   if (entries.length === 0) return '{}'
   const pairs = entries.map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
-  if (pairs.join(', ').length <= 60) {
-    return `{ ${pairs.join(', ')} }`
+  const inline = pairs.join(', ')
+  if (inline.length <= 60) {
+    return `{ ${inline} }`
   }
   return `{\n    ${pairs.join(',\n    ')},\n  }`
 }

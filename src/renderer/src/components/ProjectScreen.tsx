@@ -37,6 +37,7 @@ export function ProjectScreen({
   const [pageOverrides, setPageOverrides] = useState<Record<string, unknown>>({})
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const varDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pageVarDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
@@ -94,6 +95,9 @@ export function ProjectScreen({
   const selectedBlockManifest: BlockManifest | undefined =
     themeManifest?.blocks.find((b) => b.name === selectedBlock?.blockName)
 
+  const hasThemeVariables =
+    themeManifest != null && Object.keys(themeManifest.variables).length > 0
+
   const resolvedVars = themeManifest
     ? resolveVariables(themeManifest.variables, projectOverrides, pageOverrides)
     : {}
@@ -122,8 +126,6 @@ export function ProjectScreen({
     },
     [projectOverrides, project.path]
   )
-
-  const pageVarDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handlePageVariableChange = useCallback(
     (name: string, value: unknown) => {
@@ -219,7 +221,7 @@ export function ProjectScreen({
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar tree={tree} selectedPath={selectedItem?.fullPath ?? null} onSelect={handleSelect} />
-        {themeManifest && Object.keys(themeManifest.variables).length > 0 && (
+        {hasThemeVariables && (
           <VariableEditorPanel
             themeVariables={themeManifest.variables}
             resolved={resolvedVars}
@@ -260,7 +262,7 @@ export function ProjectScreen({
                   onChange={handlePropChange}
                 />
               )}
-              {themeManifest && Object.keys(themeManifest.variables).length > 0 && (
+              {hasThemeVariables && (
                 <VariableEditorPanel
                   themeVariables={themeManifest.variables}
                   resolved={resolvedVars}

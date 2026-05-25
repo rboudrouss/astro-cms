@@ -1,4 +1,4 @@
-import type { ThemeVariable } from '../shared/types'
+import type { ThemeVariable } from './types'
 
 export type ResolvedVariable = {
   value: unknown
