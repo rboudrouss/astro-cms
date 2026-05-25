@@ -1,8 +1,6 @@
 import { writeFile, rename, unlink, readdir, readFile, mkdir, access } from 'fs/promises'
 import { join, dirname, relative, parse } from 'path'
-import type { CreatePageOptions, CreatePageResult, InternalLinkReference } from '../shared/types'
-
-const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+import { VALID_SLUG, type CreatePageOptions, type CreatePageResult, type InternalLinkReference } from '../shared/types'
 
 function validateSlug(slug: string): string | null {
   if (!slug) return 'Slug cannot be empty'
@@ -79,11 +77,10 @@ async function collectFiles(dir: string): Promise<string[]> {
   }
 
   for (const entry of dirEntries) {
-    const name = String(entry.name)
-    const fullPath = join(dir, name)
+    const fullPath = join(dir, entry.name)
     if (entry.isDirectory()) {
       result.push(...(await collectFiles(fullPath)))
-    } else if (entry.isFile() && CONTENT_EXTENSIONS.has(parse(name).ext)) {
+    } else if (entry.isFile() && CONTENT_EXTENSIONS.has(parse(entry.name).ext)) {
       result.push(fullPath)
     }
   }
@@ -128,8 +125,7 @@ async function collectDirectories(baseDir: string, current: string): Promise<str
 
   for (const entry of dirEntries) {
     if (!entry.isDirectory()) continue
-    const name = String(entry.name)
-    const rel = current ? `${current}/${name}` : name
+    const rel = current ? `${current}/${entry.name}` : entry.name
     result.push(rel)
     result.push(...(await collectDirectories(baseDir, rel)))
   }

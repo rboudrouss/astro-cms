@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import type { LayoutManifest } from '../../../shared/types'
-
-const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+import { VALID_SLUG, type LayoutManifest } from '../../../shared/types'
 
 export function PageCreationDialog({
   projectPath,

@@ -148,7 +148,6 @@ export function ProjectScreen({
           onSelect={handleSelect}
           projectPath={project.path}
           themeManifest={themeManifest}
-          onPageCreated={() => {}}
           onPageRenamed={(oldPath, _newPath) => {
             if (selectedItem?.fullPath === oldPath) {
               setSelectedItem(null)

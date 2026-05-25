@@ -149,6 +149,8 @@ export type DevServerStatus = {
   error?: string
 }
 
+export const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
 export type CreatePageOptions = {
   projectPath: string
   directory: string
