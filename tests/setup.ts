@@ -65,7 +65,12 @@ Object.defineProperty(window, 'api', {
     getCollectionSchema: vi.fn().mockResolvedValue(null),
     createEntry: vi.fn().mockResolvedValue({ status: 'success', entry: { type: 'entry', name: 'new', relativePath: 'new.mdx', fullPath: '/tmp/new.mdx' } }),
     deleteEntry: vi.fn().mockResolvedValue(undefined),
-    updateEntryFrontmatter: vi.fn().mockResolvedValue(undefined)
+    updateEntryFrontmatter: vi.fn().mockResolvedValue(undefined),
+    createPage: vi.fn().mockResolvedValue({ success: true, filePath: '' }),
+    renamePage: vi.fn().mockResolvedValue(''),
+    deletePage: vi.fn().mockResolvedValue(undefined),
+    findInternalLinks: vi.fn().mockResolvedValue([]),
+    listPageDirectories: vi.fn().mockResolvedValue([''])
   },
   writable: true,
   configurable: true

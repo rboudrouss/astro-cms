@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo, AssetInfo, CollectionSchema, CreateEntryResult } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo, AssetInfo, CollectionSchema, CreateEntryResult, CreatePageOptions, CreatePageResult, InternalLinkReference } from '../shared/types'
 import type { GitWorkflowStatus } from '../shared/git-types'
 import type { ValidationReport } from '../shared/validation'
 
@@ -173,7 +173,17 @@ const api = {
   deleteEntry: (filePath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DELETE_ENTRY, filePath),
   updateEntryFrontmatter: (filePath: string, frontmatter: Record<string, unknown>): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.UPDATE_ENTRY_FRONTMATTER, filePath, frontmatter)
+    ipcRenderer.invoke(IpcChannels.UPDATE_ENTRY_FRONTMATTER, filePath, frontmatter),
+  createPage: (options: CreatePageOptions): Promise<CreatePageResult> =>
+    ipcRenderer.invoke(IpcChannels.CREATE_PAGE, options),
+  renamePage: (filePath: string, newSlug: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.RENAME_PAGE, filePath, newSlug),
+  deletePage: (filePath: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DELETE_PAGE, filePath),
+  findInternalLinks: (projectPath: string, slug: string): Promise<InternalLinkReference[]> =>
+    ipcRenderer.invoke(IpcChannels.FIND_INTERNAL_LINKS, projectPath, slug),
+  listPageDirectories: (projectPath: string): Promise<string[]> =>
+    ipcRenderer.invoke(IpcChannels.LIST_PAGE_DIRECTORIES, projectPath)
 }
 
 export type ElectronApi = typeof api

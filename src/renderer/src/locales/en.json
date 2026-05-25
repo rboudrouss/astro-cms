@@ -86,6 +86,37 @@
     "untitled": "Untitled",
     "preview": "Social Card Preview"
   },
+  "pageWizard": {
+    "title": "New page",
+    "slug": "Page name (slug)",
+    "slugPlaceholder": "my-page",
+    "directory": "Directory",
+    "directoryRoot": "(root)",
+    "layout": "Layout",
+    "create": "Create",
+    "cancel": "Cancel",
+    "creating": "Creating…",
+    "errorSlugEmpty": "Page name is required",
+    "errorSlugInvalid": "Only lowercase letters, numbers, and hyphens allowed",
+    "success": "Page \"{{slug}}\" created successfully"
+  },
+  "pageActions": {
+    "newPage": "New page",
+    "rename": "Rename",
+    "delete": "Delete",
+    "confirmDeleteTitle": "Delete page",
+    "confirmDeleteMessage": "Are you sure you want to delete \"{{name}}\"?",
+    "confirmDeleteWithLinks": "{{count}} other page(s) link to this page. Deleting it may break those links.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "renameTitle": "Rename page",
+    "renameSlug": "New name (slug)",
+    "renameSave": "Rename",
+    "renameCancel": "Cancel",
+    "brokenLinksWarning": "{{count}} page(s) may have broken links after this rename:",
+    "errorRenameFailed": "Rename failed",
+    "errorDeleteFailed": "Delete failed"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

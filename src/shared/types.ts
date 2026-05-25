@@ -204,3 +204,22 @@ export type EntryValidationError = {
 export type CreateEntryResult =
   | { status: 'success'; entry: EntryNode }
   | { status: 'error'; message: string }
+
+export const VALID_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+export type CreatePageOptions = {
+  projectPath: string
+  directory: string
+  slug: string
+  layoutPath: string
+}
+
+export type CreatePageResult =
+  | { success: true; filePath: string }
+  | { success: false; error: string }
+
+export type InternalLinkReference = {
+  filePath: string
+  line: number
+  content: string
+}

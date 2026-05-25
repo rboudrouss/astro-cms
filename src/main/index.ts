@@ -31,6 +31,7 @@ import { DEFAULT_GIT_CONFIG, type GitWorkflowStatus } from '../shared/git-types'
 import { scanAssets, uploadAsset, IMAGE_EXTENSIONS } from './asset-manager'
 import { loadCollectionSchema } from './collection-schema-parser'
 import { createEntry, deleteEntry, updateEntryFrontmatter } from './entry-manager'
+import { createPage, renamePage, deletePage, findInternalLinks, listPageDirectories } from './page-manager'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -424,6 +425,29 @@ function registerIpcHandlers(): void {
       await updateEntryFrontmatter(filePath, frontmatter)
     }
   )
+
+  ipcMain.handle(IpcChannels.CREATE_PAGE, async (_event, options) => {
+    return createPage(options)
+  })
+
+  ipcMain.handle(IpcChannels.RENAME_PAGE, async (_event, filePath: string, newSlug: string) => {
+    return renamePage(filePath, newSlug)
+  })
+
+  ipcMain.handle(IpcChannels.DELETE_PAGE, async (_event, filePath: string) => {
+    await deletePage(filePath)
+  })
+
+  ipcMain.handle(
+    IpcChannels.FIND_INTERNAL_LINKS,
+    async (_event, projectPath: string, slug: string) => {
+      return findInternalLinks(projectPath, slug)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.LIST_PAGE_DIRECTORIES, async (_event, projectPath: string) => {
+    return listPageDirectories(projectPath)
+  })
 }
 
 app.whenReady().then(() => {
