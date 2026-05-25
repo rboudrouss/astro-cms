@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, FileText, FolderOpen, Plus, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -228,9 +228,9 @@ function DeleteDialog({
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useState(() => {
+  useEffect(() => {
     window.api.findInternalLinks(projectPath, page.name).then(setLinks)
-  })
+  }, [projectPath, page.name])
 
   const handleDelete = async (): Promise<void> => {
     setDeleting(true)
