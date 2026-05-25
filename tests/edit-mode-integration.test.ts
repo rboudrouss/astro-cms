@@ -137,4 +137,11 @@ describe('generateEditModeScript', () => {
 
     expect(script).toContain('astro-cms-selected')
   })
+
+  it('includes CSS variable injection listener', () => {
+    const script = generateEditModeScript()
+
+    expect(script).toContain('astro-cms:variables-updated')
+    expect(script).toContain('astro-cms-variables')
+  })
 })

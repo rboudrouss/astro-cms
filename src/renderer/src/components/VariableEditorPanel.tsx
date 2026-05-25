@@ -7,6 +7,8 @@ type Props = {
   resolved: Record<string, ResolvedVariable>
   onChange: (name: string, value: unknown) => void
   onReset?: (name: string) => void
+  overrideSource?: 'project' | 'page'
+  title?: string
 }
 
 function inputTypeForVariable(varType: string): string {
@@ -19,19 +21,20 @@ export function VariableEditorPanel({
   themeVariables,
   resolved,
   onChange,
-  onReset
+  onReset,
+  overrideSource,
+  title
 }: Props): React.JSX.Element {
   const { t } = useTranslation()
 
   return (
     <div data-testid="variable-editor-panel" className="flex flex-col gap-3 border-l p-3">
-      <h3 className="text-sm font-semibold">{t('variableEditor.title')}</h3>
+      <h3 className="text-sm font-semibold">{title ?? t('variableEditor.title')}</h3>
       {Object.entries(themeVariables).map(([name, variable]) => {
         const rv = resolved[name]
         const value = rv?.value
         const source = rv?.source ?? 'theme'
-        const inputType = inputTypeForVariable(variable.type)
-        const isOverridden = source !== 'theme'
+        const showReset = overrideSource ? source === overrideSource : source !== 'theme'
 
         return (
           <div key={name} className="flex flex-col gap-1">
@@ -44,22 +47,36 @@ export function VariableEditorPanel({
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <input
-                id={`var-${name}`}
-                aria-label={name}
-                type={inputType}
-                className="flex-1 rounded border px-2 py-1 text-sm"
-                value={value != null ? String(value) : ''}
-                onChange={(e) => {
-                  const raw = e.target.value
-                  if (variable.type === 'number') {
-                    onChange(name, raw === '' ? undefined : Number(raw))
-                  } else {
-                    onChange(name, raw)
-                  }
-                }}
-              />
-              {isOverridden && onReset && (
+              {variable.type === 'select' && variable.options ? (
+                <select
+                  id={`var-${name}`}
+                  aria-label={name}
+                  className="flex-1 rounded border px-2 py-1 text-sm"
+                  value={value != null ? String(value) : ''}
+                  onChange={(e) => onChange(name, e.target.value)}
+                >
+                  {variable.options.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={`var-${name}`}
+                  aria-label={name}
+                  type={inputTypeForVariable(variable.type)}
+                  className="flex-1 rounded border px-2 py-1 text-sm"
+                  value={value != null ? String(value) : ''}
+                  onChange={(e) => {
+                    const raw = e.target.value
+                    if (variable.type === 'number') {
+                      onChange(name, raw === '' ? undefined : Number(raw))
+                    } else {
+                      onChange(name, raw)
+                    }
+                  }}
+                />
+              )}
+              {showReset && onReset && (
                 <button
                   type="button"
                   className="text-xs text-muted-foreground hover:text-foreground"

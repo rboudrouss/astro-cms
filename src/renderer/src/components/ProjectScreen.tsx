@@ -10,6 +10,7 @@ import { BlockInfoBar } from '@/components/BlockInfoBar'
 import { PropEditorPanel } from '@/components/PropEditorPanel'
 import { VariableEditorPanel } from '@/components/VariableEditorPanel'
 import { resolveVariables } from '../../../shared/variable-resolver'
+import { generateCssVariables } from '../../../shared/css-variable-injection'
 import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
@@ -97,6 +98,8 @@ export function ProjectScreen({
     ? resolveVariables(themeManifest.variables, projectOverrides, pageOverrides)
     : {}
 
+  const cssVariables = generateCssVariables(resolvedVars)
+
   const handleVariableChange = useCallback(
     (name: string, value: unknown) => {
       const next = { ...projectOverrides, [name]: value }
@@ -118,6 +121,35 @@ export function ProjectScreen({
       window.api.setVariableOverrides(project.path, next)
     },
     [projectOverrides, project.path]
+  )
+
+  const pageVarDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handlePageVariableChange = useCallback(
+    (name: string, value: unknown) => {
+      const next = { ...pageOverrides, [name]: value }
+      if (value === undefined) delete next[name]
+      setPageOverrides(next)
+      if (pageVarDebounceRef.current) clearTimeout(pageVarDebounceRef.current)
+      if (!selectedItem) return
+      const filePath = selectedItem.fullPath
+      pageVarDebounceRef.current = setTimeout(() => {
+        window.api.setPageVariableOverrides(filePath, next)
+      }, DEBOUNCE_MS)
+    },
+    [pageOverrides, selectedItem]
+  )
+
+  const handlePageVariableReset = useCallback(
+    (name: string) => {
+      const next = { ...pageOverrides }
+      delete next[name]
+      setPageOverrides(next)
+      if (selectedItem) {
+        window.api.setPageVariableOverrides(selectedItem.fullPath, next)
+      }
+    },
+    [pageOverrides, selectedItem]
   )
 
   const handleSelect = useCallback(async (item: SidebarItem) => {
@@ -158,6 +190,7 @@ export function ProjectScreen({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
       if (varDebounceRef.current) clearTimeout(varDebounceRef.current)
+      if (pageVarDebounceRef.current) clearTimeout(pageVarDebounceRef.current)
     }
   }, [])
 
@@ -192,6 +225,7 @@ export function ProjectScreen({
             resolved={resolvedVars}
             onChange={handleVariableChange}
             onReset={handleVariableReset}
+            overrideSource="project"
           />
         )}
 
@@ -208,7 +242,7 @@ export function ProjectScreen({
               <div className="flex w-1/2 flex-col">
                 {devServerUrl ? (
                   <>
-                    <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} />
+                    <PreviewPane url={devServerUrl} pagePath={selectedItem.relativePath} cssVariables={cssVariables} />
                     {selectedBlock && <BlockInfoBar selection={selectedBlock} />}
                   </>
                 ) : (
@@ -224,6 +258,16 @@ export function ProjectScreen({
                   cmsHints={selectedBlockManifest.cmsHints}
                   values={blockProps}
                   onChange={handlePropChange}
+                />
+              )}
+              {themeManifest && Object.keys(themeManifest.variables).length > 0 && (
+                <VariableEditorPanel
+                  themeVariables={themeManifest.variables}
+                  resolved={resolvedVars}
+                  onChange={handlePageVariableChange}
+                  onReset={handlePageVariableReset}
+                  overrideSource="page"
+                  title={t('variableEditor.pageTitle')}
                 />
               )}
             </>

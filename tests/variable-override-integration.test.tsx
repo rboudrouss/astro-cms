@@ -131,4 +131,58 @@ describe('Variable override integration', () => {
       )
     })
   })
+
+  it('shows page variable editor panel when a page is selected', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+
+    renderWithI18n(<ProjectScreen project={project} onBack={vi.fn()} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('index.mdx')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByText('index.mdx'))
+
+    await waitFor(() => {
+      const panels = screen.getAllByTestId('variable-editor-panel')
+      expect(panels.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  it('saves page variable overrides on change (debounced)', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+
+    renderWithI18n(<ProjectScreen project={project} onBack={vi.fn()} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('index.mdx')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByText('index.mdx'))
+
+    await waitFor(() => {
+      const panels = screen.getAllByTestId('variable-editor-panel')
+      expect(panels.length).toBeGreaterThanOrEqual(2)
+    })
+
+    const fontSizeInputs = screen.getAllByLabelText('fontSize')
+    const pageInput = fontSizeInputs[fontSizeInputs.length - 1]
+
+    act(() => {
+      fireEvent.change(pageInput, { target: { value: '20' } })
+    })
+
+    expect(window.api.setPageVariableOverrides).not.toHaveBeenCalled()
+
+    act(() => {
+      vi.advanceTimersByTime(500)
+    })
+
+    await waitFor(() => {
+      expect(window.api.setPageVariableOverrides).toHaveBeenCalledWith(
+        '/project/src/pages/index.mdx',
+        expect.objectContaining({ fontSize: 20 })
+      )
+    })
+  })
 })

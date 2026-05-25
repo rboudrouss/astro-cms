@@ -164,4 +164,66 @@ describe('VariableEditorPanel', () => {
     fireEvent.click(screen.getByText('Reset'))
     expect(onReset).toHaveBeenCalledWith('mainColor')
   })
+
+  it('renders select input for select type with options', () => {
+    const selectVars: Record<string, ThemeVariable> = {
+      layout: { type: 'select', default: 'grid', options: ['grid', 'list', 'masonry'] }
+    }
+    const selectResolved: Record<string, ResolvedVariable> = {
+      layout: { value: 'grid', source: 'theme' }
+    }
+    render(
+      <VariableEditorPanel
+        themeVariables={selectVars}
+        resolved={selectResolved}
+        onChange={vi.fn()}
+      />
+    )
+    const select = screen.getByLabelText('layout')
+    expect(select.tagName).toBe('SELECT')
+    expect(select).toHaveValue('grid')
+    const options = select.querySelectorAll('option')
+    expect(options).toHaveLength(3)
+    expect(options[0]).toHaveTextContent('grid')
+    expect(options[1]).toHaveTextContent('list')
+    expect(options[2]).toHaveTextContent('masonry')
+  })
+
+  it('calls onChange with selected value for select type', () => {
+    const onChange = vi.fn()
+    const selectVars: Record<string, ThemeVariable> = {
+      layout: { type: 'select', default: 'grid', options: ['grid', 'list', 'masonry'] }
+    }
+    const selectResolved: Record<string, ResolvedVariable> = {
+      layout: { value: 'grid', source: 'theme' }
+    }
+    render(
+      <VariableEditorPanel
+        themeVariables={selectVars}
+        resolved={selectResolved}
+        onChange={onChange}
+      />
+    )
+    fireEvent.change(screen.getByLabelText('layout'), { target: { value: 'masonry' } })
+    expect(onChange).toHaveBeenCalledWith('layout', 'masonry')
+  })
+
+  it('only shows reset for matching overrideSource', () => {
+    const resolved: Record<string, ResolvedVariable> = {
+      mainColor: { value: '#f00', source: 'project' },
+      fontSize: { value: 24, source: 'page' },
+      fontFamily: { value: 'sans-serif', source: 'theme' }
+    }
+    render(
+      <VariableEditorPanel
+        themeVariables={themeVars}
+        resolved={resolved}
+        onChange={vi.fn()}
+        onReset={vi.fn()}
+        overrideSource="page"
+      />
+    )
+    const resetButtons = screen.getAllByText('Reset')
+    expect(resetButtons).toHaveLength(1)
+  })
 })

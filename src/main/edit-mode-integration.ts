@@ -41,6 +41,16 @@ export function generateEditModeScript(): string {
     }
   }, true);
 
+  var varStyle = document.createElement('style');
+  varStyle.id = 'astro-cms-variables';
+  document.head.appendChild(varStyle);
+
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'astro-cms:variables-updated' && typeof e.data.css === 'string') {
+      varStyle.textContent = e.data.css;
+    }
+  });
+
   document.addEventListener('click', function(e) {
     const block = e.target.closest('[data-block-id]');
     if (!block) return;

@@ -92,6 +92,7 @@ export type LayoutManifest = {
 export type ThemeVariable = {
   type: string
   default: unknown
+  options?: string[]
 }
 
 export type ThemeManifest = {

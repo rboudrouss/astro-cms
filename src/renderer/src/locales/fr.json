@@ -67,6 +67,7 @@
   },
   "variableEditor": {
     "title": "Variables du thème",
+    "pageTitle": "Variables de la page",
     "source": {
       "theme": "Défaut du thème",
       "project": "Override projet",
