@@ -1,12 +1,7 @@
 import { parseMdx, writeMdx } from './mdx-parser'
 import type { Root } from 'mdast'
 import type { MdxJsxFlowElement, MdxJsxAttribute, MdxJsxAttributeValueExpression } from 'mdast-util-mdx-jsx'
-
-export type BlockInstance = {
-  id: string
-  blockName: string
-  props: Record<string, unknown>
-}
+import type { BlockInstance } from '../shared/types'
 
 function readAttrValue(attr: MdxJsxAttribute): unknown {
   if (attr.value == null) return true
@@ -105,7 +100,7 @@ export async function insertBlockMdx(
   if (jsxIndices.length === 0 || position >= jsxIndices.length) {
     insertAt = ast.body.children.length
   } else {
-    insertAt = jsxIndices[Math.min(position, jsxIndices.length - 1)]
+    insertAt = jsxIndices[position]
   }
 
   ast.body.children.splice(insertAt, 0, newNode as unknown as Root['children'][number])
@@ -132,13 +127,8 @@ export async function reorderBlockMdx(
   if (fromIndex < 0 || fromIndex >= jsxIndices.length) return source
   if (toIndex < 0 || toIndex >= jsxIndices.length) return source
 
-  const fromAstIdx = jsxIndices[fromIndex]
-  const toAstIdx = jsxIndices[toIndex]
-
-  const [movedNode] = ast.body.children.splice(fromAstIdx, 1)
-  const adjustedTo = fromAstIdx < toAstIdx ? toAstIdx - 1 : toAstIdx
-  const insertAfter = fromIndex < toIndex
-  ast.body.children.splice(insertAfter ? adjustedTo + 1 : adjustedTo, 0, movedNode)
+  const [movedNode] = ast.body.children.splice(jsxIndices[fromIndex], 1)
+  ast.body.children.splice(jsxIndices[toIndex], 0, movedNode)
 
   return writeMdx(ast)
 }

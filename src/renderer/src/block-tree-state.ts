@@ -1,8 +1,5 @@
-export type BlockInstance = {
-  id: string
-  blockName: string
-  props: Record<string, unknown>
-}
+import type { BlockInstance } from '../../shared/types'
+export type { BlockInstance }
 
 export type BlockTreeState = {
   blocks: BlockInstance[]
@@ -47,9 +44,8 @@ export function reduce(state: BlockTreeState, action: BlockTreeAction): BlockTre
     }
 
     case 'DELETE': {
-      const idx = state.blocks.findIndex((b) => b.id === action.blockId)
-      if (idx === -1) return state
       const newBlocks = state.blocks.filter((b) => b.id !== action.blockId)
+      if (newBlocks.length === state.blocks.length) return state
       return withUndo(state, newBlocks)
     }
 
