@@ -85,10 +85,12 @@ export function EntryEditorForm({
           )
         }
 
-        const inputType =
-          field.type === 'number' ? 'number' :
-          field.type === 'date' ? 'date' :
-          'text'
+        let inputType: string
+        switch (field.type) {
+          case 'number': inputType = 'number'; break
+          case 'date': inputType = 'date'; break
+          default: inputType = 'text'
+        }
 
         return (
           <div key={field.name} className="flex flex-col gap-1">

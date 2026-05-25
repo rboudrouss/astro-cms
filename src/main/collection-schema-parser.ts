@@ -143,14 +143,10 @@ function extractSchemaObject(defineCollectionCall: Node): Node | null {
 }
 
 function extractFieldsFromZodObject(schemaNode: Node): CollectionFieldSchema[] {
-  const text = schemaNode.getText()
-  const match = text.match(/^z\.object\(/)
-  if (!match) return []
+  if (!schemaNode.getText().startsWith('z.object(')) return []
+  if (schemaNode.getKind() !== SyntaxKind.CallExpression) return []
 
-  const call = schemaNode as CallExpression
-  const args = call.getKind() === SyntaxKind.CallExpression
-    ? (schemaNode as CallExpression).getArguments()
-    : []
+  const args = (schemaNode as CallExpression).getArguments()
   if (args.length === 0) return []
 
   const objArg = args[0]

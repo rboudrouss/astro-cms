@@ -14,6 +14,12 @@ type Props = {
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
+function validateSlug(slug: string, t: (key: string) => string): string | null {
+  if (!slug.trim()) return t('entryEditor.slugRequired')
+  if (!SLUG_RE.test(slug)) return t('entryEditor.slugInvalid')
+  return null
+}
+
 function buildDefaults(schema: CollectionSchema | null): Record<string, unknown> {
   if (!schema) return {}
   const defaults: Record<string, unknown> = {}
@@ -39,22 +45,13 @@ export function NewEntryDialog({
 
   const handleSlugChange = (newSlug: string): void => {
     setSlug(newSlug)
-    if (!newSlug.trim()) {
-      setSlugError(t('entryEditor.slugRequired'))
-    } else if (!SLUG_RE.test(newSlug)) {
-      setSlugError(t('entryEditor.slugInvalid'))
-    } else {
-      setSlugError(null)
-    }
+    setSlugError(validateSlug(newSlug, t))
   }
 
   const handleSubmit = (): void => {
-    if (!slug.trim()) {
-      setSlugError(t('entryEditor.slugRequired'))
-      return
-    }
-    if (!SLUG_RE.test(slug)) {
-      setSlugError(t('entryEditor.slugInvalid'))
+    const slugErr = validateSlug(slug, t)
+    if (slugErr) {
+      setSlugError(slugErr)
       return
     }
 
