@@ -85,5 +85,15 @@
       "page": "Override page"
     },
     "reset": "Réinitialiser"
+  },
+  "git": {
+    "saving": "Sauvegarde…",
+    "idle": "À jour",
+    "committing": "Sauvegarde auto…",
+    "pushing": "Envoi en cours…",
+    "error": "Erreur de sync",
+    "divergenceWarning": "La branche distante a de nouveaux changements. Récupérez-les avant d'éditer pour éviter les conflits.",
+    "save": "Sauvegarder",
+    "divergedBehind": "{{count}} commit(s) en retard sur le remote"
   }
 }

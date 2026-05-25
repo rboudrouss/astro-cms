@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
 import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance } from '../shared/types'
+import type { GitWorkflowStatus } from '../shared/git-types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -124,7 +125,23 @@ const api = {
     filePath: string,
     overrides: Record<string, unknown>
   ): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.SET_PAGE_VARIABLE_OVERRIDES, filePath, overrides)
+    ipcRenderer.invoke(IpcChannels.SET_PAGE_VARIABLE_OVERRIDES, filePath, overrides),
+  initGitWorkflow: (projectPath: string): Promise<GitWorkflowStatus> =>
+    ipcRenderer.invoke(IpcChannels.GIT_INIT_WORKFLOW, projectPath),
+  gitAutoSave: (): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.GIT_AUTO_SAVE),
+  gitSave: (): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.GIT_SAVE),
+  gitGetStatus: (): Promise<GitWorkflowStatus | null> =>
+    ipcRenderer.invoke(IpcChannels.GIT_GET_STATUS),
+  onGitStatusChanged: (callback: (status: GitWorkflowStatus) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, status: GitWorkflowStatus): void =>
+      callback(status)
+    ipcRenderer.on(IpcChannels.GIT_STATUS_CHANGED, handler)
+    return () => {
+      ipcRenderer.removeListener(IpcChannels.GIT_STATUS_CHANGED, handler)
+    }
+  }
 }
 
 export type ElectronApi = typeof api

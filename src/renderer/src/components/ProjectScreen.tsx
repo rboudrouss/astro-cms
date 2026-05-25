@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Sidebar } from '@/components/Sidebar'
 import { RawEditor } from '@/components/RawEditor'
 import { DevServerIndicator } from '@/components/DevServerIndicator'
+import { GitStatusIndicator } from '@/components/GitStatusIndicator'
+import { DivergenceWarningBanner } from '@/components/DivergenceWarningBanner'
 import { PreviewPane } from '@/components/PreviewPane'
 import { BlockInfoBar } from '@/components/BlockInfoBar'
 import { PropEditorPanel } from '@/components/PropEditorPanel'
@@ -19,6 +21,7 @@ import type {
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest,
   BlockInstance
 } from '../../../shared/types'
+import { DEFAULT_GIT_STATUS, type GitWorkflowStatus } from '../../../shared/git-types'
 
 const DEBOUNCE_MS = 500
 
@@ -42,6 +45,7 @@ export function ProjectScreen({
   const [blockTree, dispatchBlockTree] = useReducer(reduce, initialState())
   const undoSourceStack = useRef<string[]>([])
   const redoSourceStack = useRef<string[]>([])
+  const [gitStatus, setGitStatus] = useState<GitWorkflowStatus>(DEFAULT_GIT_STATUS)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const varDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pageVarDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -53,17 +57,20 @@ export function ProjectScreen({
     window.api.getThemeManifest(project.path).then((m) => {
       if (m) setThemeManifest(m)
     })
+    window.api.initGitWorkflow(project.path).then(setGitStatus)
 
     window.api.getVariableOverrides(project.path).then(setProjectOverrides)
 
     const unsubTree = window.api.onProjectTreeChanged(setTree)
     const unsubStatus = window.api.onDevServerStatusChanged(setDevServerStatus)
     const unsubManifest = window.api.onThemeManifestUpdated(setThemeManifest)
+    const unsubGit = window.api.onGitStatusChanged(setGitStatus)
 
     return () => {
       unsubTree()
       unsubStatus()
       unsubManifest()
+      unsubGit()
       window.api.unwatchProject()
       window.api.stopDevServer()
     }
@@ -338,10 +345,12 @@ export function ProjectScreen({
           <FolderOpen className="h-4 w-4" />
           {project.path}
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <GitStatusIndicator status={gitStatus} />
           <DevServerIndicator status={devServerStatus} />
         </div>
       </header>
+      <DivergenceWarningBanner divergence={gitStatus.divergence} />
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex w-56 flex-col overflow-y-auto border-r">

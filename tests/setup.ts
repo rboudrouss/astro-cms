@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest'
+import { DEFAULT_GIT_STATUS } from '../src/shared/git-types'
 
 Object.defineProperty(window, 'api', {
   value: {
@@ -37,7 +38,15 @@ Object.defineProperty(window, 'api', {
     getVariableOverrides: vi.fn().mockResolvedValue({}),
     setVariableOverrides: vi.fn().mockResolvedValue(undefined),
     getPageVariableOverrides: vi.fn().mockResolvedValue({}),
-    setPageVariableOverrides: vi.fn().mockResolvedValue(undefined)
+    setPageVariableOverrides: vi.fn().mockResolvedValue(undefined),
+    initGitWorkflow: vi.fn().mockResolvedValue({
+      ...DEFAULT_GIT_STATUS,
+      currentBranch: 'astro-cms-work'
+    }),
+    gitAutoSave: vi.fn().mockResolvedValue(undefined),
+    gitSave: vi.fn().mockResolvedValue(undefined),
+    gitGetStatus: vi.fn().mockResolvedValue(null),
+    onGitStatusChanged: vi.fn().mockReturnValue(vi.fn())
   },
   writable: true,
   configurable: true

@@ -1,4 +1,5 @@
 import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance } from './types'
+import type { GitWorkflowStatus } from './git-types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -39,7 +40,12 @@ export const IpcChannels = {
   GET_PAGE_BLOCKS: 'page:get-blocks',
   INSERT_BLOCK: 'page:insert-block',
   DELETE_BLOCK: 'page:delete-block',
-  REORDER_BLOCKS: 'page:reorder-blocks'
+  REORDER_BLOCKS: 'page:reorder-blocks',
+  GIT_INIT_WORKFLOW: 'git:init-workflow',
+  GIT_AUTO_SAVE: 'git:auto-save',
+  GIT_SAVE: 'git:save',
+  GIT_GET_STATUS: 'git:get-status',
+  GIT_STATUS_CHANGED: 'git:status-changed'
 } as const
 
 export type RecentProject = {
@@ -121,4 +127,8 @@ export type IpcHandlerMap = {
     args: [filePath: string, fromIndex: number, toIndex: number]
     return: string
   }
+  [IpcChannels.GIT_INIT_WORKFLOW]: { args: [projectPath: string]; return: GitWorkflowStatus }
+  [IpcChannels.GIT_AUTO_SAVE]: { args: []; return: void }
+  [IpcChannels.GIT_SAVE]: { args: []; return: void }
+  [IpcChannels.GIT_GET_STATUS]: { args: []; return: GitWorkflowStatus | null }
 }

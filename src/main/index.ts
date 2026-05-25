@@ -22,11 +22,15 @@ import {
   readPageVariableOverrides,
   writePageVariableOverrides
 } from './page-variable-overrides'
+import { GitWorkflow } from './git-workflow'
+import { createSimpleGitOps } from './simple-git-ops'
+import { DEFAULT_GIT_CONFIG, type GitWorkflowStatus } from '../shared/git-types'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
 let activeWatcher: ProjectWatcher | null = null
 let activeDevServer: AstroDevServer | null = null
+let activeGitWorkflow: GitWorkflow | null = null
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -297,6 +301,37 @@ function registerIpcHandlers(): void {
       await writePageContent(filePath, updated)
     }
   )
+
+  ipcMain.handle(IpcChannels.GIT_INIT_WORKFLOW, async (_event, projectPath: string) => {
+    if (activeGitWorkflow) {
+      activeGitWorkflow.dispose()
+    }
+    const ops = createSimpleGitOps(projectPath)
+    const broadcast = (status: GitWorkflowStatus): void => {
+      for (const win of BrowserWindow.getAllWindows()) {
+        win.webContents.send(IpcChannels.GIT_STATUS_CHANGED, status)
+      }
+    }
+    activeGitWorkflow = new GitWorkflow(DEFAULT_GIT_CONFIG, ops, broadcast)
+    await activeGitWorkflow.init()
+    return activeGitWorkflow.status
+  })
+
+  ipcMain.handle(IpcChannels.GIT_AUTO_SAVE, async () => {
+    if (activeGitWorkflow) {
+      await activeGitWorkflow.autoSave()
+    }
+  })
+
+  ipcMain.handle(IpcChannels.GIT_SAVE, async () => {
+    if (activeGitWorkflow) {
+      await activeGitWorkflow.save()
+    }
+  })
+
+  ipcMain.handle(IpcChannels.GIT_GET_STATUS, () => {
+    return activeGitWorkflow?.status ?? null
+  })
 }
 
 app.whenReady().then(() => {
@@ -316,6 +351,10 @@ app.on('window-all-closed', () => {
   if (activeDevServer) {
     activeDevServer.stop()
     activeDevServer = null
+  }
+  if (activeGitWorkflow) {
+    activeGitWorkflow.dispose()
+    activeGitWorkflow = null
   }
   if (process.platform !== 'darwin') {
     app.quit()
