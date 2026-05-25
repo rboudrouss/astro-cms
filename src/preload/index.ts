@@ -96,6 +96,13 @@ const api = {
     ipcRenderer.invoke(IpcChannels.UPDATE_TEXT_CONTENT, filePath, nodeIndex, newMarkdown),
   saveInlineEdit: (filePath: string, nodeIndex: number, html: string): Promise<string> =>
     ipcRenderer.invoke(IpcChannels.SAVE_INLINE_EDIT, filePath, nodeIndex, html),
+  getPageFrontmatter: (filePath: string): Promise<Record<string, unknown>> =>
+    ipcRenderer.invoke(IpcChannels.GET_PAGE_FRONTMATTER, filePath),
+  updatePageFrontmatter: (
+    filePath: string,
+    fields: Record<string, unknown>
+  ): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_PAGE_FRONTMATTER, filePath, fields),
   startDevServer: (projectPath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
   stopDevServer: (): Promise<void> =>

@@ -31,6 +31,8 @@ export const IpcChannels = {
   GET_TEXT_NODES: 'page:get-text-nodes',
   UPDATE_TEXT_CONTENT: 'page:update-text-content',
   SAVE_INLINE_EDIT: 'page:save-inline-edit',
+  GET_PAGE_FRONTMATTER: 'page:get-frontmatter',
+  UPDATE_PAGE_FRONTMATTER: 'page:update-frontmatter',
   DEV_SERVER_START: 'dev-server:start',
   DEV_SERVER_STOP: 'dev-server:stop',
   DEV_SERVER_RESTART: 'dev-server:restart',
@@ -108,6 +110,14 @@ export type IpcHandlerMap = {
   }
   [IpcChannels.SAVE_INLINE_EDIT]: {
     args: [filePath: string, nodeIndex: number, html: string]
+    return: string
+  }
+  [IpcChannels.GET_PAGE_FRONTMATTER]: {
+    args: [filePath: string]
+    return: Record<string, unknown>
+  }
+  [IpcChannels.UPDATE_PAGE_FRONTMATTER]: {
+    args: [filePath: string, fields: Record<string, unknown>]
     return: string
   }
   [IpcChannels.DEV_SERVER_START]: { args: [projectPath: string]; return: void }

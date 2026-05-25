@@ -16,6 +16,7 @@ import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
 import { extractBlocks, insertBlockMdx, deleteBlockMdx, reorderBlockMdx } from './mdx-block-tree'
 import { extractTextNodes, updateTextContent } from './mdx-content-updater'
 import { htmlToMarkdown } from './tiptap-serializer'
+import { extractFrontmatter, updateFrontmatter } from './frontmatter-updater'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
@@ -238,6 +239,21 @@ function registerIpcHandlers(): void {
       const newMarkdown = (await htmlToMarkdown(html)).trimEnd()
       const source = await readPageContent(filePath)
       const updated = await updateTextContent(source, nodeIndex, newMarkdown)
+      await writePageContent(filePath, updated)
+      return updated
+    }
+  )
+
+  ipcMain.handle(IpcChannels.GET_PAGE_FRONTMATTER, async (_event, filePath: string) => {
+    const source = await readPageContent(filePath)
+    return extractFrontmatter(source)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPDATE_PAGE_FRONTMATTER,
+    async (_event, filePath: string, fields: Record<string, unknown>) => {
+      const source = await readPageContent(filePath)
+      const updated = await updateFrontmatter(source, fields)
       await writePageContent(filePath, updated)
       return updated
     }

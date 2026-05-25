@@ -76,6 +76,16 @@
     "library": "Bibliothèque",
     "upload": "Uploader"
   },
+  "seo": {
+    "title": "SEO",
+    "metaTitle": "Titre meta",
+    "metaDescription": "Description meta",
+    "ogImage": "Image OG",
+    "ogImageAlt": "Aperçu de la carte sociale",
+    "noImage": "Aucune image",
+    "untitled": "Sans titre",
+    "preview": "Aperçu carte sociale"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",

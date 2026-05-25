@@ -17,12 +17,17 @@ import { BlockPalette } from '@/components/BlockPalette'
 import { BlockListPanel } from '@/components/BlockListPanel'
 import { reduce, initialState } from '@/block-tree-state'
 import { InlineEditor } from '@/components/InlineEditor'
+import { SeoPanel } from '@/components/SeoPanel'
 import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, TextSelectionMessage,
   ThemeManifest, BlockManifest, BlockInstance, TextNodeInfo
 } from '../../../shared/types'
 import { DEFAULT_GIT_STATUS, type GitWorkflowStatus } from '../../../shared/git-types'
+import {
+  detectSeoFields, extractSeoValues, seoValuesToFields, hasSeoFields
+} from '../../../shared/seo-fields'
+import type { SeoFieldMapping, SeoValues } from '../../../shared/seo-fields'
 
 const DEBOUNCE_MS = 500
 
@@ -72,6 +77,9 @@ export function ProjectScreen({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const varDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pageVarDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [seoMapping, setSeoMapping] = useState<SeoFieldMapping>({})
+  const [seoValues, setSeoValues] = useState<SeoValues>({})
+  const seoDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     window.api.scanProject(project.path).then(setTree)
@@ -219,7 +227,15 @@ export function ProjectScreen({
     await loadPageBlocksFresh(item.fullPath)
     const nodes = await window.api.getTextNodes(item.fullPath)
     setTextNodes(nodes)
-  }, [loadPageBlocksFresh])
+
+    const frontmatter = await window.api.getPageFrontmatter(item.fullPath)
+    const layout = themeManifest?.layouts.find((l) =>
+      typeof frontmatter.layout === 'string' && frontmatter.layout.includes(l.name)
+    )
+    const mapping = detectSeoFields(frontmatter, layout?.cmsHints)
+    setSeoMapping(mapping)
+    setSeoValues(extractSeoValues(frontmatter, mapping))
+  }, [loadPageBlocksFresh, themeManifest])
 
   const handleSave = useCallback(
     async (content: string) => {
@@ -379,15 +395,53 @@ export function ProjectScreen({
   const handleInlineCancel = useCallback(() => {
     setTextSelection(null)
   }, [])
+
+  const handleSeoChange = useCallback(
+    (values: SeoValues) => {
+      setSeoValues(values)
+      if (!selectedItem) return
+      if (seoDebounceRef.current) clearTimeout(seoDebounceRef.current)
+      seoDebounceRef.current = setTimeout(async () => {
+        const fields = seoValuesToFields(values, seoMapping)
+        const updated = await window.api.updatePageFrontmatter(selectedItem.fullPath, fields)
+        setEditorContent(updated)
+      }, DEBOUNCE_MS)
+    },
+    [selectedItem, seoMapping]
+  )
+
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
       if (varDebounceRef.current) clearTimeout(varDebounceRef.current)
       if (pageVarDebounceRef.current) clearTimeout(pageVarDebounceRef.current)
+      if (seoDebounceRef.current) clearTimeout(seoDebounceRef.current)
     }
   }, [])
 
   const devServerUrl = devServerStatus.state === 'running' ? devServerStatus.url : undefined
+
+  let sidePanel: React.ReactNode = null
+  if (selectedBlockManifest && blockProps) {
+    sidePanel = (
+      <PropEditorPanel
+        blockName={selectedBlockManifest.name}
+        schema={selectedBlockManifest.props}
+        cmsHints={selectedBlockManifest.cmsHints}
+        values={blockProps}
+        onChange={handlePropChange}
+        projectPath={project.path}
+      />
+    )
+  } else if (hasSeoFields(seoMapping)) {
+    sidePanel = (
+      <SeoPanel
+        mapping={seoMapping}
+        values={seoValues}
+        onChange={handleSeoChange}
+      />
+    )
+  }
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -478,16 +532,6 @@ export function ProjectScreen({
                   </div>
                 )}
               </div>
-              {selectedBlockManifest && blockProps && (
-                <PropEditorPanel
-                  blockName={selectedBlockManifest.name}
-                  schema={selectedBlockManifest.props}
-                  cmsHints={selectedBlockManifest.cmsHints}
-                  values={blockProps}
-                  onChange={handlePropChange}
-                  projectPath={project.path}
-                />
-              )}
               {hasThemeVariables && (
                 <VariableEditorPanel
                   themeVariables={themeManifest.variables}
@@ -498,6 +542,7 @@ export function ProjectScreen({
                   title={t('variableEditor.pageTitle')}
                 />
               )}
+              {sidePanel}
             </>
           ) : selectedItem ? (
             <div className="flex flex-1 items-center justify-center">

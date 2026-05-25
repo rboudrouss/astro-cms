@@ -40,6 +40,8 @@ Object.defineProperty(window, 'api', {
     getTextNodes: vi.fn().mockResolvedValue([]),
     updateTextContent: vi.fn().mockResolvedValue(''),
     saveInlineEdit: vi.fn().mockResolvedValue(''),
+    getPageFrontmatter: vi.fn().mockResolvedValue({}),
+    updatePageFrontmatter: vi.fn().mockResolvedValue(''),
     startDevServer: vi.fn().mockResolvedValue(undefined),
     stopDevServer: vi.fn().mockResolvedValue(undefined),
     restartDevServer: vi.fn().mockResolvedValue(undefined),
