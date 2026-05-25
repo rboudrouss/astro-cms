@@ -1,9 +1,11 @@
 import { readdir, stat, copyFile, mkdir } from 'fs/promises'
-import { Dirent } from 'fs'
+import type { Dirent } from 'fs'
 import { join, extname, basename } from 'path'
 import type { AssetInfo } from '../shared/types'
 
-const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.avif'])
+export const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif']
+
+const IMAGE_EXTENSION_SET = new Set(IMAGE_EXTENSIONS.map((e) => `.${e}`))
 
 export async function scanAssets(uploadsDir: string): Promise<AssetInfo[]> {
   let entries: Dirent[]
@@ -18,7 +20,7 @@ export async function scanAssets(uploadsDir: string): Promise<AssetInfo[]> {
   for (const entry of entries) {
     if (!entry.isFile()) continue
     const name = String(entry.name)
-    if (!IMAGE_EXTENSIONS.has(extname(name).toLowerCase())) continue
+    if (!IMAGE_EXTENSION_SET.has(extname(name).toLowerCase())) continue
 
     const fullPath = join(uploadsDir, name)
     const stats = await stat(fullPath)

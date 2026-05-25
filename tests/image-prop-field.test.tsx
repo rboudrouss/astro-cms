@@ -42,7 +42,7 @@ describe('Image prop field', () => {
     )
 
     expect(screen.getByTestId('image-prop-field')).toBeInTheDocument()
-    expect(screen.queryBySelector?.('input[type="text"]')).toBeFalsy()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
   })
 
   it('displays current image path value', () => {
