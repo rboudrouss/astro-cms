@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance, TextNodeInfo } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance, TextNodeInfo, AssetInfo } from './types'
 import type { GitWorkflowStatus } from './git-types'
 import type { ValidationReport } from './validation'
 
@@ -48,7 +48,10 @@ export const IpcChannels = {
   GIT_AUTO_SAVE: 'git:auto-save',
   GIT_SAVE: 'git:save',
   GIT_GET_STATUS: 'git:get-status',
-  GIT_STATUS_CHANGED: 'git:status-changed'
+  GIT_STATUS_CHANGED: 'git:status-changed',
+  SCAN_ASSETS: 'assets:scan',
+  UPLOAD_ASSET: 'assets:upload',
+  SELECT_IMAGE_FILE: 'dialog:select-image-file'
 } as const
 
 export type RecentProject = {
@@ -146,4 +149,10 @@ export type IpcHandlerMap = {
   [IpcChannels.GIT_AUTO_SAVE]: { args: []; return: void }
   [IpcChannels.GIT_SAVE]: { args: []; return: void }
   [IpcChannels.GIT_GET_STATUS]: { args: []; return: GitWorkflowStatus | null }
+  [IpcChannels.SCAN_ASSETS]: { args: [uploadsDir: string]; return: AssetInfo[] }
+  [IpcChannels.UPLOAD_ASSET]: {
+    args: [sourcePath: string, uploadsDir: string]
+    return: string
+  }
+  [IpcChannels.SELECT_IMAGE_FILE]: { args: []; return: string | null }
 }

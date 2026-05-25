@@ -56,7 +56,10 @@ Object.defineProperty(window, 'api', {
     gitAutoSave: vi.fn().mockResolvedValue(undefined),
     gitSave: vi.fn().mockResolvedValue(undefined),
     gitGetStatus: vi.fn().mockResolvedValue(null),
-    onGitStatusChanged: vi.fn().mockReturnValue(vi.fn())
+    onGitStatusChanged: vi.fn().mockReturnValue(vi.fn()),
+    scanAssets: vi.fn().mockResolvedValue([]),
+    uploadAsset: vi.fn().mockResolvedValue('uploaded.png'),
+    selectImageFile: vi.fn().mockResolvedValue(null)
   },
   writable: true,
   configurable: true

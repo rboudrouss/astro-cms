@@ -151,7 +151,7 @@ describe('Block prop edition (Mode B1)', () => {
     await renderAndSelectBlock()
 
     await waitFor(() => {
-      expect(screen.getByLabelText('image')).toBeInTheDocument()
+      expect(screen.getByTestId('image-prop-field')).toBeInTheDocument()
       expect(screen.getByLabelText('text')).toBeInTheDocument()
       expect(screen.getByLabelText('reversed')).toBeInTheDocument()
     })
@@ -161,7 +161,7 @@ describe('Block prop edition (Mode B1)', () => {
     await renderAndSelectBlock()
 
     await waitFor(() => {
-      expect(screen.getByLabelText('image')).toHaveValue('/hero.png')
+      expect(screen.getByText('/hero.png')).toBeInTheDocument()
       expect(screen.getByLabelText('reversed')).toBeChecked()
     })
   })
@@ -181,12 +181,17 @@ describe('Block prop edition (Mode B1)', () => {
     const user = await renderAndSelectBlock()
 
     await waitFor(() => {
-      expect(screen.getByLabelText('image')).toBeInTheDocument()
+      expect(screen.getByTestId('image-prop-field')).toBeInTheDocument()
     })
 
-    const imageInput = screen.getByLabelText('image')
-    await user.clear(imageInput)
-    await user.type(imageInput, '/new.png')
+    ;(window.api.selectImageFile as ReturnType<typeof vi.fn>).mockResolvedValue('/tmp/new.png')
+    ;(window.api.uploadAsset as ReturnType<typeof vi.fn>).mockResolvedValue('new.png')
+
+    await user.click(screen.getByRole('button', { name: /upload/i }))
+
+    await waitFor(() => {
+      expect(window.api.uploadAsset).toHaveBeenCalled()
+    })
 
     expect(window.api.updateBlockProps).not.toHaveBeenCalled()
 
@@ -198,7 +203,7 @@ describe('Block prop edition (Mode B1)', () => {
       expect(window.api.updateBlockProps).toHaveBeenCalledWith(
         '/projects/my-site/src/pages/index.mdx',
         'ImageText',
-        expect.objectContaining({ image: '/new.png' })
+        expect.objectContaining({ image: 'new.png' })
       )
     })
   })

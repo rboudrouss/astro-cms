@@ -164,6 +164,13 @@ export type TextNodeInfo = {
   textContent: string
 }
 
+export type AssetInfo = {
+  name: string
+  relativePath: string
+  fullPath: string
+  size: number
+}
+
 export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'
 
 export type DevServerStatus = {

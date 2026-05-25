@@ -27,6 +27,7 @@ import {
 import { GitWorkflow } from './git-workflow'
 import { createSimpleGitOps } from './simple-git-ops'
 import { DEFAULT_GIT_CONFIG, type GitWorkflowStatus } from '../shared/git-types'
+import { scanAssets, uploadAsset, IMAGE_EXTENSIONS } from './asset-manager'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -359,6 +360,26 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IpcChannels.GIT_GET_STATUS, () => {
     return activeGitWorkflow?.status ?? null
+  })
+
+  ipcMain.handle(IpcChannels.SCAN_ASSETS, async (_event, uploadsDir: string) => {
+    return scanAssets(uploadsDir)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPLOAD_ASSET,
+    async (_event, sourcePath: string, uploadsDir: string) => {
+      return uploadAsset(sourcePath, uploadsDir)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.SELECT_IMAGE_FILE, async (): Promise<string | null> => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Images', extensions: [...IMAGE_EXTENSIONS] }]
+    })
+    if (result.canceled || !result.filePaths[0]) return null
+    return result.filePaths[0]
   })
 }
 

@@ -69,6 +69,13 @@
     "undo": "Annuler",
     "redo": "Rétablir"
   },
+  "imageLibrary": {
+    "title": "Bibliothèque d'images",
+    "search": "Rechercher des images...",
+    "noImages": "Aucune image trouvée",
+    "library": "Bibliothèque",
+    "upload": "Uploader"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",

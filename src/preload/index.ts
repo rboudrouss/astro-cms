@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo, AssetInfo } from '../shared/types'
 import type { GitWorkflowStatus } from '../shared/git-types'
 import type { ValidationReport } from '../shared/validation'
 
@@ -147,7 +147,13 @@ const api = {
     return () => {
       ipcRenderer.removeListener(IpcChannels.GIT_STATUS_CHANGED, handler)
     }
-  }
+  },
+  scanAssets: (uploadsDir: string): Promise<AssetInfo[]> =>
+    ipcRenderer.invoke(IpcChannels.SCAN_ASSETS, uploadsDir),
+  uploadAsset: (sourcePath: string, uploadsDir: string): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.UPLOAD_ASSET, sourcePath, uploadsDir),
+  selectImageFile: (): Promise<string | null> =>
+    ipcRenderer.invoke(IpcChannels.SELECT_IMAGE_FILE)
 }
 
 export type ElectronApi = typeof api

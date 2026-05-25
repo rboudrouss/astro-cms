@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { PropSchema, CmsHints } from '../../../shared/types'
+import { ImagePropField } from './ImagePropField'
 
 type Props = {
   blockName: string
@@ -7,6 +8,7 @@ type Props = {
   cmsHints: CmsHints
   values: Record<string, unknown>
   onChange: (values: Record<string, unknown>) => void
+  projectPath?: string
 }
 
 function resolveInputType(prop: PropSchema, hint?: { format?: string }): string {
@@ -26,7 +28,8 @@ export function PropEditorPanel({
   schema,
   cmsHints,
   values,
-  onChange
+  onChange,
+  projectPath
 }: Props): React.JSX.Element {
   const [local, setLocal] = useState(values)
 
@@ -68,6 +71,19 @@ export function PropEditorPanel({
                 <span className="text-xs text-muted-foreground">{prop.description}</span>
               )}
             </div>
+          )
+        }
+
+        if (hint?.format === 'image' && projectPath) {
+          return (
+            <ImagePropField
+              key={prop.name}
+              name={prop.name}
+              description={prop.description}
+              value={typeof value === 'string' ? value : ''}
+              projectPath={projectPath}
+              onChange={(v) => handleChange(prop.name, v)}
+            />
           )
         }
 

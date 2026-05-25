@@ -69,6 +69,13 @@
     "undo": "Undo",
     "redo": "Redo"
   },
+  "imageLibrary": {
+    "title": "Image Library",
+    "search": "Search images...",
+    "noImages": "No images found",
+    "library": "Library",
+    "upload": "Upload"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

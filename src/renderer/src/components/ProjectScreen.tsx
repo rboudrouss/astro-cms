@@ -485,6 +485,7 @@ export function ProjectScreen({
                   cmsHints={selectedBlockManifest.cmsHints}
                   values={blockProps}
                   onChange={handlePropChange}
+                  projectPath={project.path}
                 />
               )}
               {hasThemeVariables && (
