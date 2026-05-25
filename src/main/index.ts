@@ -235,7 +235,7 @@ function registerIpcHandlers(): void {
         win.webContents.send(IpcChannels.GIT_STATUS_CHANGED, status)
       }
     }
-    activeGitWorkflow = new GitWorkflow(projectPath, DEFAULT_GIT_CONFIG, ops, broadcast)
+    activeGitWorkflow = new GitWorkflow(DEFAULT_GIT_CONFIG, ops, broadcast)
     await activeGitWorkflow.init()
     return activeGitWorkflow.status
   })

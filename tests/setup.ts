@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest'
+import { DEFAULT_GIT_STATUS } from '../src/shared/git-types'
 
 Object.defineProperty(window, 'api', {
   value: {
@@ -31,12 +32,8 @@ Object.defineProperty(window, 'api', {
     onDevServerStatusChanged: vi.fn().mockReturnValue(vi.fn()),
     onDevServerOutput: vi.fn().mockReturnValue(vi.fn()),
     initGitWorkflow: vi.fn().mockResolvedValue({
-      state: 'idle',
-      currentBranch: 'astro-cms-work',
-      lastCommitHash: null,
-      lastCommitTime: null,
-      divergence: null,
-      error: null
+      ...DEFAULT_GIT_STATUS,
+      currentBranch: 'astro-cms-work'
     }),
     gitAutoSave: vi.fn().mockResolvedValue(undefined),
     gitSave: vi.fn().mockResolvedValue(undefined),

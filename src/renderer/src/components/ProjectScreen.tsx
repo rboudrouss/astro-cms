@@ -14,7 +14,7 @@ import type {
   ProjectInfo, ProjectTree, SidebarItem, DevServerStatus,
   BlockSelection, BlockSelectionMessage, ThemeManifest, BlockManifest
 } from '../../../shared/types'
-import type { GitWorkflowStatus } from '../../../shared/git-types'
+import { DEFAULT_GIT_STATUS, type GitWorkflowStatus } from '../../../shared/git-types'
 
 const DEBOUNCE_MS = 500
 
@@ -33,14 +33,7 @@ export function ProjectScreen({
   const [selectedBlock, setSelectedBlock] = useState<BlockSelection | null>(null)
   const [themeManifest, setThemeManifest] = useState<ThemeManifest | null>(null)
   const [blockProps, setBlockProps] = useState<Record<string, unknown> | null>(null)
-  const [gitStatus, setGitStatus] = useState<GitWorkflowStatus>({
-    state: 'idle',
-    currentBranch: null,
-    lastCommitHash: null,
-    lastCommitTime: null,
-    divergence: null,
-    error: null
-  })
+  const [gitStatus, setGitStatus] = useState<GitWorkflowStatus>(DEFAULT_GIT_STATUS)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {

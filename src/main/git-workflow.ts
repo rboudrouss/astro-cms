@@ -1,17 +1,11 @@
 import type { GitOps } from './git-ops'
 import type { GitConfig, GitWorkflowStatus, DivergenceInfo } from '../shared/git-types'
+import { DEFAULT_GIT_STATUS } from '../shared/git-types'
 
 const AUTO_SAVE_MESSAGE = 'astro-cms: auto-save'
 
 export class GitWorkflow {
-  private _status: GitWorkflowStatus = {
-    state: 'idle',
-    currentBranch: null,
-    lastCommitHash: null,
-    lastCommitTime: null,
-    divergence: null,
-    error: null
-  }
+  private _status: GitWorkflowStatus = { ...DEFAULT_GIT_STATUS }
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null
   private readonly config: GitConfig
@@ -20,7 +14,6 @@ export class GitWorkflow {
   private readonly debounceMs: number
 
   constructor(
-    projectPath: string,
     config: GitConfig,
     ops: GitOps,
     onStatusChanged: (status: GitWorkflowStatus) => void,

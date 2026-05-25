@@ -26,3 +26,12 @@ export type GitWorkflowStatus = {
   divergence: DivergenceInfo | null
   error: string | null
 }
+
+export const DEFAULT_GIT_STATUS: GitWorkflowStatus = {
+  state: 'idle',
+  currentBranch: null,
+  lastCommitHash: null,
+  lastCommitTime: null,
+  divergence: null,
+  error: null
+}

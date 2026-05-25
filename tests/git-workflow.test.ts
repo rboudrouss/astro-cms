@@ -41,12 +41,12 @@ describe('GitWorkflow', () => {
 
   describe('initial state', () => {
     it('starts in idle state', () => {
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       expect(wf.status.state).toBe('idle')
     })
 
     it('has null fields before init', () => {
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       expect(wf.status.currentBranch).toBeNull()
       expect(wf.status.lastCommitHash).toBeNull()
       expect(wf.status.divergence).toBeNull()
@@ -61,7 +61,7 @@ describe('GitWorkflow', () => {
           .mockResolvedValueOnce('main')
           .mockResolvedValue('astro-cms-work')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(ops.checkoutNewBranch).toHaveBeenCalledWith('astro-cms-work')
@@ -75,7 +75,7 @@ describe('GitWorkflow', () => {
           .mockResolvedValueOnce('main')
           .mockResolvedValue('astro-cms-work')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(ops.checkout).toHaveBeenCalledWith('astro-cms-work')
@@ -87,7 +87,7 @@ describe('GitWorkflow', () => {
         branchLocal: vi.fn().mockResolvedValue(['main', 'astro-cms-work']),
         currentBranch: vi.fn().mockResolvedValue('astro-cms-work')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(ops.checkout).not.toHaveBeenCalled()
@@ -99,7 +99,7 @@ describe('GitWorkflow', () => {
         branchLocal: vi.fn().mockResolvedValue(['main', 'astro-cms-work']),
         currentBranch: vi.fn().mockResolvedValue('astro-cms-work')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(onStatusChanged).toHaveBeenCalled()
@@ -112,7 +112,7 @@ describe('GitWorkflow', () => {
       ops = createMockGitOps({
         branchLocal: vi.fn().mockRejectedValue(new Error('not a git repo'))
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(wf.status.state).toBe('error')
@@ -128,7 +128,7 @@ describe('GitWorkflow', () => {
         revParse: vi.fn().mockResolvedValue('same-hash'),
         log: vi.fn().mockResolvedValue([])
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(wf.status.divergence).toEqual({ diverged: false, ahead: 0, behind: 0 })
@@ -152,7 +152,7 @@ describe('GitWorkflow', () => {
           return []
         })
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(wf.status.divergence).toEqual({ diverged: true, ahead: 0, behind: 2 })
@@ -168,7 +168,7 @@ describe('GitWorkflow', () => {
           return 'abc1234'
         })
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       expect(wf.status.divergence).toEqual({ diverged: false, ahead: 0, behind: 0 })
@@ -183,7 +183,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: false, files: ['src/pages/index.mdx'] }),
         commit: vi.fn().mockResolvedValue('def5678')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
       onStatusChanged.mockClear()
 
@@ -200,7 +200,7 @@ describe('GitWorkflow', () => {
         currentBranch: vi.fn().mockResolvedValue('astro-cms-work'),
         status: vi.fn().mockResolvedValue({ isClean: true, files: [] })
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
       onStatusChanged.mockClear()
 
@@ -219,7 +219,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: false, files: ['f.mdx'] }),
         commit: vi.fn().mockResolvedValue('hash')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
       states.length = 0
 
@@ -236,7 +236,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: false, files: ['f.mdx'] }),
         commit: vi.fn().mockRejectedValue(new Error('commit failed'))
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       await wf.autoSave()
@@ -253,7 +253,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: false, files: ['f.mdx'] }),
         commit: vi.fn().mockImplementation(() => new Promise<string>((r) => { commitResolve = r }))
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       const first = wf.autoSave()
@@ -273,7 +273,7 @@ describe('GitWorkflow', () => {
         currentBranch: vi.fn().mockResolvedValue('astro-cms-work'),
         status: vi.fn().mockResolvedValue({ isClean: true, files: [] })
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       await wf.save()
@@ -291,7 +291,7 @@ describe('GitWorkflow', () => {
         commit: vi.fn().mockImplementation(async () => { callOrder.push('commit'); return 'h' }),
         push: vi.fn().mockImplementation(async () => { callOrder.push('push') })
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       await wf.save()
@@ -308,7 +308,7 @@ describe('GitWorkflow', () => {
         currentBranch: vi.fn().mockResolvedValue('astro-cms-work'),
         status: vi.fn().mockResolvedValue({ isClean: true, files: [] })
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
       states.length = 0
 
@@ -325,7 +325,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: true, files: [] }),
         push: vi.fn().mockRejectedValue(new Error('push rejected'))
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged)
       await wf.init()
 
       await wf.save()
@@ -344,7 +344,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: false, files: ['a.mdx'] }),
         commit: vi.fn().mockResolvedValue('hash')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged, 500)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged, 500)
       await wf.init()
 
       wf.onFileChanged()
@@ -367,7 +367,7 @@ describe('GitWorkflow', () => {
         status: vi.fn().mockResolvedValue({ isClean: false, files: ['a.mdx'] }),
         commit: vi.fn().mockResolvedValue('hash')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged, 500)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged, 500)
       await wf.init()
 
       wf.onFileChanged()
@@ -397,7 +397,7 @@ describe('GitWorkflow', () => {
           .mockResolvedValueOnce('production')
           .mockResolvedValue('cms-draft')
       })
-      const wf = new GitWorkflow('/project', customConfig, ops, onStatusChanged)
+      const wf = new GitWorkflow(customConfig, ops, onStatusChanged)
       await wf.init()
 
       expect(ops.checkoutNewBranch).toHaveBeenCalledWith('cms-draft')
@@ -412,7 +412,7 @@ describe('GitWorkflow', () => {
         branchLocal: vi.fn().mockResolvedValue(['astro-cms-work']),
         currentBranch: vi.fn().mockResolvedValue('astro-cms-work')
       })
-      const wf = new GitWorkflow('/project', TEST_CONFIG, ops, onStatusChanged, 500)
+      const wf = new GitWorkflow(TEST_CONFIG, ops, onStatusChanged, 500)
 
       wf.onFileChanged()
       wf.dispose()
