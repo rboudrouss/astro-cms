@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo, AssetInfo } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance, TextNodeInfo, AssetInfo, CollectionSchema, CreateEntryResult } from '../shared/types'
 import type { GitWorkflowStatus } from '../shared/git-types'
 import type { ValidationReport } from '../shared/validation'
 
@@ -160,7 +160,20 @@ const api = {
   uploadAsset: (sourcePath: string, uploadsDir: string): Promise<string> =>
     ipcRenderer.invoke(IpcChannels.UPLOAD_ASSET, sourcePath, uploadsDir),
   selectImageFile: (): Promise<string | null> =>
-    ipcRenderer.invoke(IpcChannels.SELECT_IMAGE_FILE)
+    ipcRenderer.invoke(IpcChannels.SELECT_IMAGE_FILE),
+  getCollectionSchema: (projectPath: string, collectionName: string): Promise<CollectionSchema | null> =>
+    ipcRenderer.invoke(IpcChannels.GET_COLLECTION_SCHEMA, projectPath, collectionName),
+  createEntry: (
+    projectPath: string,
+    collectionName: string,
+    slug: string,
+    frontmatter: Record<string, unknown>
+  ): Promise<CreateEntryResult> =>
+    ipcRenderer.invoke(IpcChannels.CREATE_ENTRY, projectPath, collectionName, slug, frontmatter),
+  deleteEntry: (filePath: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.DELETE_ENTRY, filePath),
+  updateEntryFrontmatter: (filePath: string, frontmatter: Record<string, unknown>): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.UPDATE_ENTRY_FRONTMATTER, filePath, frontmatter)
 }
 
 export type ElectronApi = typeof api

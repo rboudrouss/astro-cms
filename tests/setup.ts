@@ -61,7 +61,11 @@ Object.defineProperty(window, 'api', {
     onGitStatusChanged: vi.fn().mockReturnValue(vi.fn()),
     scanAssets: vi.fn().mockResolvedValue([]),
     uploadAsset: vi.fn().mockResolvedValue('uploaded.png'),
-    selectImageFile: vi.fn().mockResolvedValue(null)
+    selectImageFile: vi.fn().mockResolvedValue(null),
+    getCollectionSchema: vi.fn().mockResolvedValue(null),
+    createEntry: vi.fn().mockResolvedValue({ status: 'success', entry: { type: 'entry', name: 'new', relativePath: 'new.mdx', fullPath: '/tmp/new.mdx' } }),
+    deleteEntry: vi.fn().mockResolvedValue(undefined),
+    updateEntryFrontmatter: vi.fn().mockResolvedValue(undefined)
   },
   writable: true,
   configurable: true

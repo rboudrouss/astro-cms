@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance, TextNodeInfo, AssetInfo } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance, TextNodeInfo, AssetInfo, CollectionSchema, CreateEntryResult, EntryNode } from './types'
 import type { GitWorkflowStatus } from './git-types'
 import type { ValidationReport } from './validation'
 
@@ -53,7 +53,11 @@ export const IpcChannels = {
   GIT_STATUS_CHANGED: 'git:status-changed',
   SCAN_ASSETS: 'assets:scan',
   UPLOAD_ASSET: 'assets:upload',
-  SELECT_IMAGE_FILE: 'dialog:select-image-file'
+  SELECT_IMAGE_FILE: 'dialog:select-image-file',
+  GET_COLLECTION_SCHEMA: 'collection:get-schema',
+  CREATE_ENTRY: 'entry:create',
+  DELETE_ENTRY: 'entry:delete',
+  UPDATE_ENTRY_FRONTMATTER: 'entry:update-frontmatter'
 } as const
 
 export type RecentProject = {
@@ -165,4 +169,20 @@ export type IpcHandlerMap = {
     return: string
   }
   [IpcChannels.SELECT_IMAGE_FILE]: { args: []; return: string | null }
+  [IpcChannels.GET_COLLECTION_SCHEMA]: {
+    args: [projectPath: string, collectionName: string]
+    return: CollectionSchema | null
+  }
+  [IpcChannels.CREATE_ENTRY]: {
+    args: [projectPath: string, collectionName: string, slug: string, frontmatter: Record<string, unknown>]
+    return: CreateEntryResult
+  }
+  [IpcChannels.DELETE_ENTRY]: {
+    args: [filePath: string]
+    return: void
+  }
+  [IpcChannels.UPDATE_ENTRY_FRONTMATTER]: {
+    args: [filePath: string, frontmatter: Record<string, unknown>]
+    return: void
+  }
 }

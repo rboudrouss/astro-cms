@@ -29,6 +29,8 @@ import { GitWorkflow } from './git-workflow'
 import { createSimpleGitOps } from './simple-git-ops'
 import { DEFAULT_GIT_CONFIG, type GitWorkflowStatus } from '../shared/git-types'
 import { scanAssets, uploadAsset, IMAGE_EXTENSIONS } from './asset-manager'
+import { loadCollectionSchema } from './collection-schema-parser'
+import { createEntry, deleteEntry, updateEntryFrontmatter } from './entry-manager'
 
 let recentProjectsStore: RecentProjectsStore
 let activeReloader: ThemeHotReloader | null = null
@@ -321,6 +323,13 @@ function registerIpcHandlers(): void {
   )
 
   ipcMain.handle(
+    IpcChannels.GET_COLLECTION_SCHEMA,
+    async (_event, projectPath: string, collectionName: string) => {
+      return loadCollectionSchema(projectPath, collectionName)
+    }
+  )
+
+  ipcMain.handle(
     IpcChannels.SET_VARIABLE_OVERRIDES,
     async (_event, projectPath: string, overrides: Record<string, unknown>) => {
       const configPath = join(projectPath, 'astro-cms.config.ts')
@@ -397,6 +406,24 @@ function registerIpcHandlers(): void {
     if (result.canceled || !result.filePaths[0]) return null
     return result.filePaths[0]
   })
+
+  ipcMain.handle(
+    IpcChannels.CREATE_ENTRY,
+    async (_event, projectPath: string, collectionName: string, slug: string, frontmatter: Record<string, unknown>) => {
+      return createEntry(projectPath, collectionName, slug, frontmatter)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.DELETE_ENTRY, async (_event, filePath: string) => {
+    await deleteEntry(filePath)
+  })
+
+  ipcMain.handle(
+    IpcChannels.UPDATE_ENTRY_FRONTMATTER,
+    async (_event, filePath: string, frontmatter: Record<string, unknown>) => {
+      await updateEntryFrontmatter(filePath, frontmatter)
+    }
+  )
 }
 
 app.whenReady().then(() => {

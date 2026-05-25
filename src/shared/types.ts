@@ -179,3 +179,28 @@ export type DevServerStatus = {
   port?: number
   error?: string
 }
+
+export type CollectionFieldType = 'string' | 'number' | 'boolean' | 'date' | 'enum' | 'unknown'
+
+export type CollectionFieldSchema = {
+  name: string
+  type: CollectionFieldType
+  required: boolean
+  default?: unknown
+  description?: string
+  enumValues?: string[]
+}
+
+export type CollectionSchema = {
+  name: string
+  fields: CollectionFieldSchema[]
+}
+
+export type EntryValidationError = {
+  field: string
+  message: string
+}
+
+export type CreateEntryResult =
+  | { status: 'success'; entry: EntryNode }
+  | { status: 'error'; message: string }
