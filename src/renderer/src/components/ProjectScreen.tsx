@@ -136,8 +136,9 @@ export function ProjectScreen({
       seoDebounceRef.current = setTimeout(async () => {
         const fields: Record<string, unknown> = {}
         for (const [role, fieldName] of Object.entries(seoMapping)) {
-          if (fieldName && values[role as keyof SeoValues] !== undefined) {
-            fields[fieldName] = values[role as keyof SeoValues]
+          const value = values[role as keyof SeoValues]
+          if (fieldName && value !== undefined) {
+            fields[fieldName] = value
           }
         }
         const updated = await window.api.updatePageFrontmatter(selectedItem.fullPath, fields)
@@ -155,6 +156,27 @@ export function ProjectScreen({
   }, [])
 
   const devServerUrl = devServerStatus.state === 'running' ? devServerStatus.url : undefined
+
+  let sidePanel: React.ReactNode = null
+  if (selectedBlockManifest && blockProps) {
+    sidePanel = (
+      <PropEditorPanel
+        blockName={selectedBlockManifest.name}
+        schema={selectedBlockManifest.props}
+        cmsHints={selectedBlockManifest.cmsHints}
+        values={blockProps}
+        onChange={handlePropChange}
+      />
+    )
+  } else if (hasSeoFields(seoMapping)) {
+    sidePanel = (
+      <SeoPanel
+        mapping={seoMapping}
+        values={seoValues}
+        onChange={handleSeoChange}
+      />
+    )
+  }
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -202,21 +224,7 @@ export function ProjectScreen({
                   </div>
                 )}
               </div>
-              {selectedBlockManifest && blockProps ? (
-                <PropEditorPanel
-                  blockName={selectedBlockManifest.name}
-                  schema={selectedBlockManifest.props}
-                  cmsHints={selectedBlockManifest.cmsHints}
-                  values={blockProps}
-                  onChange={handlePropChange}
-                />
-              ) : hasSeoFields(seoMapping) ? (
-                <SeoPanel
-                  mapping={seoMapping}
-                  values={seoValues}
-                  onChange={handleSeoChange}
-                />
-              ) : null}
+              {sidePanel}
             </>
           ) : selectedItem ? (
             <div className="flex flex-1 items-center justify-center">
