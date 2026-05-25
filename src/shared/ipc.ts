@@ -1,4 +1,4 @@
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree } from './types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, BlockInstance } from './types'
 import type { ValidationReport } from './validation'
 
 export const IpcChannels = {
@@ -35,7 +35,11 @@ export const IpcChannels = {
   GET_VARIABLE_OVERRIDES: 'theme:get-variable-overrides',
   SET_VARIABLE_OVERRIDES: 'theme:set-variable-overrides',
   GET_PAGE_VARIABLE_OVERRIDES: 'page:get-variable-overrides',
-  SET_PAGE_VARIABLE_OVERRIDES: 'page:set-variable-overrides'
+  SET_PAGE_VARIABLE_OVERRIDES: 'page:set-variable-overrides',
+  GET_PAGE_BLOCKS: 'page:get-blocks',
+  INSERT_BLOCK: 'page:insert-block',
+  DELETE_BLOCK: 'page:delete-block',
+  REORDER_BLOCKS: 'page:reorder-blocks'
 } as const
 
 export type RecentProject = {
@@ -100,5 +104,21 @@ export type IpcHandlerMap = {
   [IpcChannels.SET_PAGE_VARIABLE_OVERRIDES]: {
     args: [filePath: string, overrides: Record<string, unknown>]
     return: void
+  }
+  [IpcChannels.GET_PAGE_BLOCKS]: {
+    args: [filePath: string]
+    return: BlockInstance[]
+  }
+  [IpcChannels.INSERT_BLOCK]: {
+    args: [filePath: string, blockName: string, props: Record<string, unknown>, position: number]
+    return: string
+  }
+  [IpcChannels.DELETE_BLOCK]: {
+    args: [filePath: string, blockIndex: number]
+    return: string
+  }
+  [IpcChannels.REORDER_BLOCKS]: {
+    args: [filePath: string, fromIndex: number, toIndex: number]
+    return: string
   }
 }

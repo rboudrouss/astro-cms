@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IpcChannels, type RecentProject, type UpdateInfo } from '../shared/ipc'
-import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus } from '../shared/types'
+import type { OpenProjectResult, NewProjectOptions, NewProjectResult, TemplateInfo, DepsCheckResult, DepsInstallResult, ThemeManifest, ProjectTree, DevServerStatus, BlockInstance } from '../shared/types'
 import type { ValidationReport } from '../shared/validation'
 
 const api = {
@@ -76,6 +76,19 @@ const api = {
     ipcRenderer.invoke(IpcChannels.UPDATE_BLOCK_PROPS, filePath, blockName, props),
   getBlockProps: (filePath: string, blockName: string): Promise<Record<string, unknown> | null> =>
     ipcRenderer.invoke(IpcChannels.GET_BLOCK_PROPS, filePath, blockName),
+  getPageBlocks: (filePath: string): Promise<BlockInstance[]> =>
+    ipcRenderer.invoke(IpcChannels.GET_PAGE_BLOCKS, filePath),
+  insertBlock: (
+    filePath: string,
+    blockName: string,
+    props: Record<string, unknown>,
+    position: number
+  ): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.INSERT_BLOCK, filePath, blockName, props, position),
+  deleteBlock: (filePath: string, blockIndex: number): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.DELETE_BLOCK, filePath, blockIndex),
+  reorderBlocks: (filePath: string, fromIndex: number, toIndex: number): Promise<string> =>
+    ipcRenderer.invoke(IpcChannels.REORDER_BLOCKS, filePath, fromIndex, toIndex),
   startDevServer: (projectPath: string): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.DEV_SERVER_START, projectPath),
   stopDevServer: (): Promise<void> =>

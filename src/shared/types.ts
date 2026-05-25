@@ -141,6 +141,12 @@ export type BlockSelectionMessage = BlockSelection & {
   type: 'astro-cms:block-selected'
 }
 
+export type BlockInstance = {
+  id: string
+  blockName: string
+  props: Record<string, unknown>
+}
+
 export type DevServerState = 'starting' | 'running' | 'error' | 'stopped'
 
 export type DevServerStatus = {

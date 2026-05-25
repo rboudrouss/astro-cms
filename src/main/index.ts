@@ -13,6 +13,7 @@ import { needsInstall, detectPackageManager, installDependencies } from './depen
 import { ThemeHotReloader } from './theme-hot-reloader'
 import { readPageContent, writePageContent } from './page-file'
 import { updateBlockProps, extractBlockProps } from './mdx-block-updater'
+import { extractBlocks, insertBlockMdx, deleteBlockMdx, reorderBlockMdx } from './mdx-block-tree'
 import { scanProjectTree } from './project-scanner'
 import { ProjectWatcher } from './project-watcher'
 import { AstroDevServer } from './astro-dev-server'
@@ -171,6 +172,41 @@ function registerIpcHandlers(): void {
     async (_event, filePath: string, blockName: string) => {
       const source = await readPageContent(filePath)
       return extractBlockProps(source, blockName)
+    }
+  )
+
+  ipcMain.handle(IpcChannels.GET_PAGE_BLOCKS, async (_event, filePath: string) => {
+    const source = await readPageContent(filePath)
+    return extractBlocks(source)
+  })
+
+  ipcMain.handle(
+    IpcChannels.INSERT_BLOCK,
+    async (_event, filePath: string, blockName: string, props: Record<string, unknown>, position: number) => {
+      const source = await readPageContent(filePath)
+      const updated = await insertBlockMdx(source, blockName, props, position)
+      await writePageContent(filePath, updated)
+      return updated
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.DELETE_BLOCK,
+    async (_event, filePath: string, blockIndex: number) => {
+      const source = await readPageContent(filePath)
+      const updated = await deleteBlockMdx(source, blockIndex)
+      await writePageContent(filePath, updated)
+      return updated
+    }
+  )
+
+  ipcMain.handle(
+    IpcChannels.REORDER_BLOCKS,
+    async (_event, filePath: string, fromIndex: number, toIndex: number) => {
+      const source = await readPageContent(filePath)
+      const updated = await reorderBlockMdx(source, fromIndex, toIndex)
+      await writePageContent(filePath, updated)
+      return updated
     }
   )
 

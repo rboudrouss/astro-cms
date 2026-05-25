@@ -58,6 +58,17 @@
     "noBlockSelected": "Select a block to edit its properties",
     "noSchema": "No editable properties for this block"
   },
+  "blockTree": {
+    "palette": "Block palette",
+    "pageBlocks": "Page blocks",
+    "emptyPalette": "No blocks available in theme",
+    "emptyPage": "No blocks on this page",
+    "insertHint": "Drag a block here to insert",
+    "deleteConfirm": "Delete block \"{{name}}\"?",
+    "deleteBtn": "Delete",
+    "undo": "Undo",
+    "redo": "Redo"
+  },
   "devServer": {
     "starting": "Starting…",
     "running": "Running",

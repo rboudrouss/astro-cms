@@ -58,6 +58,17 @@
     "noBlockSelected": "Sélectionnez un bloc pour éditer ses propriétés",
     "noSchema": "Aucune propriété éditable pour ce bloc"
   },
+  "blockTree": {
+    "palette": "Palette de blocs",
+    "pageBlocks": "Blocs de la page",
+    "emptyPalette": "Aucun bloc disponible dans le thème",
+    "emptyPage": "Aucun bloc sur cette page",
+    "insertHint": "Glissez un bloc ici pour l'insérer",
+    "deleteConfirm": "Supprimer le bloc \"{{name}}\" ?",
+    "deleteBtn": "Supprimer",
+    "undo": "Annuler",
+    "redo": "Rétablir"
+  },
   "devServer": {
     "starting": "Démarrage…",
     "running": "En cours",
