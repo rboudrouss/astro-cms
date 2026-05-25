@@ -1,6 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { I18nextProvider } from 'react-i18next'
 import { PropEditorPanel } from '../src/renderer/src/components/PropEditorPanel'
+import { initI18n } from '@/i18n'
 import type { PropSchema, CmsHints, AssetInfo } from '../src/shared/types'
 
 const imageSchema: PropSchema[] = [
@@ -17,13 +19,18 @@ const mockAssets: AssetInfo[] = [
   { name: 'banner.webp', relativePath: 'banner.webp', fullPath: '/project/src/assets/uploads/banner.webp', size: 512 }
 ]
 
+function renderWithI18n(ui: React.ReactElement): ReturnType<typeof render> {
+  const i18n = initI18n('en')
+  return render(<I18nextProvider i18n={i18n}>{ui}</I18nextProvider>)
+}
+
 describe('Image prop field', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('renders an image picker for format: image hint instead of text input', () => {
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -39,7 +46,7 @@ describe('Image prop field', () => {
   })
 
   it('displays current image path value', () => {
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -54,7 +61,7 @@ describe('Image prop field', () => {
   })
 
   it('shows Browse library button', () => {
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -69,7 +76,7 @@ describe('Image prop field', () => {
   })
 
   it('shows Upload button', () => {
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -88,7 +95,7 @@ describe('Image prop field', () => {
 
     ;(window.api.scanAssets as ReturnType<typeof vi.fn>).mockResolvedValue(mockAssets)
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -111,7 +118,7 @@ describe('Image prop field', () => {
 
     ;(window.api.scanAssets as ReturnType<typeof vi.fn>).mockResolvedValue(mockAssets)
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -137,7 +144,7 @@ describe('Image prop field', () => {
 
     ;(window.api.scanAssets as ReturnType<typeof vi.fn>).mockResolvedValue(mockAssets)
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -170,7 +177,7 @@ describe('Image prop field', () => {
     ;(window.api.selectImageFile as ReturnType<typeof vi.fn>).mockResolvedValue('/tmp/new-image.png')
     ;(window.api.uploadAsset as ReturnType<typeof vi.fn>).mockResolvedValue('new-image.png')
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -201,7 +208,7 @@ describe('Image prop field', () => {
 
     ;(window.api.selectImageFile as ReturnType<typeof vi.fn>).mockResolvedValue(null)
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -226,7 +233,7 @@ describe('Image prop field', () => {
 
     ;(window.api.scanAssets as ReturnType<typeof vi.fn>).mockResolvedValue(mockAssets)
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}
@@ -256,7 +263,7 @@ describe('Image prop field', () => {
 
     ;(window.api.scanAssets as ReturnType<typeof vi.fn>).mockResolvedValue(mockAssets)
 
-    render(
+    renderWithI18n(
       <PropEditorPanel
         blockName="ImageText"
         schema={imageSchema}

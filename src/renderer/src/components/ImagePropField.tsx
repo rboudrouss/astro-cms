@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { join } from 'path'
+import { useTranslation } from 'react-i18next'
 import { ImageLibraryModal } from './ImageLibraryModal'
 
 type Props = {
@@ -17,9 +17,10 @@ export function ImagePropField({
   projectPath,
   onChange
 }: Props): React.JSX.Element {
+  const { t } = useTranslation()
   const [showLibrary, setShowLibrary] = useState(false)
 
-  const uploadsDir = join(projectPath, 'src', 'assets', 'uploads')
+  const uploadsDir = `${projectPath}/src/assets/uploads`
 
   const handleUpload = useCallback(async () => {
     const filePath = await window.api.selectImageFile()
@@ -52,14 +53,14 @@ export function ImagePropField({
           className="rounded border px-2 py-1 text-xs hover:bg-muted"
           onClick={() => setShowLibrary(true)}
         >
-          Library
+          {t('imageLibrary.library')}
         </button>
         <button
           type="button"
           className="rounded border px-2 py-1 text-xs hover:bg-muted"
           onClick={handleUpload}
         >
-          Upload
+          {t('imageLibrary.upload')}
         </button>
       </div>
 

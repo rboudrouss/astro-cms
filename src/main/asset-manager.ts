@@ -1,15 +1,9 @@
 import { readdir, stat, copyFile, mkdir } from 'fs/promises'
 import { Dirent } from 'fs'
 import { join, extname, basename } from 'path'
+import type { AssetInfo } from '../shared/types'
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.avif'])
-
-export type AssetInfo = {
-  name: string
-  relativePath: string
-  fullPath: string
-  size: number
-}
 
 export async function scanAssets(uploadsDir: string): Promise<AssetInfo[]> {
   let entries: Dirent[]
